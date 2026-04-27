@@ -65,7 +65,18 @@ const Index = () => {
 
     setProgress(100);
     setStatus("COMPLETE");
-    toast.success("Bypass complete");
+
+    try {
+      const { error } = await supabase.functions.invoke("discord-notify", {
+        body: { version, status: "COMPLETE" },
+      });
+      if (error) throw error;
+      toast.success("Bypass complete — Discord notified");
+    } catch (err) {
+      console.error("Discord notify failed", err);
+      toast.error("Bypass complete, but Discord notification failed");
+    }
+
     setRunning(false);
   };
 
