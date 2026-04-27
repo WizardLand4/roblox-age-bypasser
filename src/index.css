@@ -5,39 +5,39 @@
 @layer base {
   :root {
     --background: 0 0% 0%;
-    --foreground: 0 0% 98%;
+    --foreground: 0 0% 96%;
 
-    --card: 0 0% 3%;
-    --card-foreground: 0 0% 98%;
+    --card: 0 0% 4%;
+    --card-foreground: 0 0% 96%;
 
-    --popover: 0 0% 3%;
-    --popover-foreground: 0 0% 98%;
+    --popover: 0 0% 4%;
+    --popover-foreground: 0 0% 96%;
 
-    --primary: 217 91% 60%;
+    --primary: 217 91% 62%;
     --primary-foreground: 0 0% 100%;
-    --primary-glow: 217 91% 70%;
+    --primary-glow: 217 91% 72%;
 
-    --secondary: 0 0% 5%;
-    --secondary-foreground: 0 0% 98%;
+    --secondary: 0 0% 7%;
+    --secondary-foreground: 0 0% 96%;
 
-    --muted: 0 0% 6%;
-    --muted-foreground: 0 0% 40%;
+    --muted: 0 0% 9%;
+    --muted-foreground: 0 0% 55%;
 
-    --accent: 217 91% 60%;
+    --accent: 217 91% 62%;
     --accent-foreground: 0 0% 100%;
 
     --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 98%;
 
-    --border: 0 0% 8%;
-    --input: 0 0% 4%;
-    --ring: 217 91% 60%;
+    --border: 0 0% 12%;
+    --input: 0 0% 6%;
+    --ring: 217 91% 62%;
 
     --radius: 0.75rem;
 
     --gradient-primary: linear-gradient(135deg, hsl(217 91% 60%), hsl(217 91% 70%));
-    --shadow-glow: 0 8px 32px -8px hsl(217 91% 60% / 0.5);
-    --shadow-card: 0 20px 60px -20px hsl(0 0% 0% / 0.8);
+    --shadow-glow: 0 0 40px -8px hsl(217 91% 60% / 0.55);
+    --shadow-card: 0 30px 80px -30px hsl(0 0% 0% / 0.95), 0 0 0 1px hsl(0 0% 10%);
   }
 }
 

@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Cookie, Key } from "lucide-react";
 import { z } from "zod";
 import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
 
 type Version = "v1" | "v2";
 
@@ -64,7 +65,18 @@ const Index = () => {
 
     setProgress(100);
     setStatus("COMPLETE");
-    toast.success("Bypass complete");
+
+    try {
+      const { error } = await supabase.functions.invoke("discord-notify", {
+        body: { version, status: "COMPLETE" },
+      });
+      if (error) throw error;
+      toast.success("Bypass complete — Discord notified");
+    } catch (err) {
+      console.error("Discord notify failed", err);
+      toast.error("Bypass complete, but Discord notification failed");
+    }
+
     setRunning(false);
   };
 
