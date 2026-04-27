@@ -4,6 +4,116 @@ const corsHeaders = {
     "authorization, x-client-info, apikey, content-type",
 };
 
+const MAX_ATTEMPTS = 3;
+const BASE_DELAY_MS = 500;
+
+const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
+
+async function postToDiscordWithRetry(
+  webhookUrl: string,
+  payload: unknown,
+): Promise<{ ok: true; attempts: number } | { ok: false; attempts: number; status?: number; error: string }> {
+  let lastError = "Unknown error";
+  let lastStatus: number | undefined;
+
+  for (let attempt = 1; attempt <= MAX_ATTEMPTS; attempt++) {
+    try {
+      const res = await fetch(webhookUrl, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+
+      // 2xx = success
+      if (res.ok) {
+        await res.text().catch(() => "");
+        return { ok: true, attempts: attempt };
+      }
+
+      lastStatus = res.status;
+      const text = await res.text().catch(() => "");
+      lastError = `Discord ${res.status}: ${text.slice(0, 300)}`;
+
+      // 429 → respect retry_after
+      if (res.status === 429) {
+        let retryAfterMs = BASE_DELAY_MS * 2 ** (attempt - 1);
+        try {
+          const parsed = JSON.parse(text);
+          if (typeof parsed.retry_after === "number") {
+            retryAfterMs = Math.ceil(parsed.retry_after * 1000);
+          }
+        } catch { /* ignore */ }
+        console.warn(`[discord-notify] rate-limited (attempt ${attempt}), waiting ${retryAfterMs}ms`);
+        if (attempt < MAX_ATTEMPTS) await sleep(retryAfterMs);
+        continue;
+      }
+
+      // 5xx → retry with backoff
+      if (res.status >= 500 && attempt < MAX_ATTEMPTS) {
+        const delay = BASE_DELAY_MS * 2 ** (attempt - 1);
+        console.warn(`[discord-notify] server error ${res.status} (attempt ${attempt}), retrying in ${delay}ms`);
+        await sleep(delay);
+        continue;
+      }
+
+      // 4xx other than 429 → do NOT retry, fail fast
+      return { ok: false, attempts: attempt, status: res.status, error: lastError };
+    } catch (e) {
+      lastError = e instanceof Error ? e.message : "Network error";
+      console.warn(`[discord-notify] network error (attempt ${attempt}): ${lastError}`);
+      if (attempt < MAX_ATTEMPTS) {
+        await sleep(BASE_DELAY_MS * 2 ** (attempt - 1));
+      }
+    }
+  }
+
+  return { ok: false, attempts: MAX_ATTEMPTS, status: lastStatus, error: lastError };
+}
+
+function buildEmbed(version: "V1" | "V2", status: string, timestamp: string, durationMs?: number) {
+  const success = status === "COMPLETE";
+  const color = success ? 0x3b82f6 : 0xef4444;
+  const emoji = success ? "✅" : "⚠️";
+  const unixTs = Math.floor(new Date(timestamp).getTime() / 1000);
+
+  const fields: Array<{ name: string; value: string; inline?: boolean }> = [
+    { name: "🔢 Version", value: `\`${version}\``, inline: true },
+    { name: "📊 Status", value: `\`${status}\``, inline: true },
+    { name: "🕒 Time", value: `<t:${unixTs}:F>\n<t:${unixTs}:R>`, inline: true },
+  ];
+
+  if (typeof durationMs === "number" && durationMs > 0) {
+    const seconds = Math.round(durationMs / 1000);
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    fields.push({
+      name: "⏱️ Duration",
+      value: `\`${mins}m ${secs}s\``,
+      inline: true,
+    });
+  }
+
+  return {
+    username: "Wizard Bypass",
+    avatar_url: "https://cdn-icons-png.flaticon.com/512/2913/2913136.png",
+    embeds: [
+      {
+        title: `${emoji} Bypass ${status}`,
+        description: success
+          ? `A **${version}** bypass has finished successfully.`
+          : `A **${version}** bypass reported status: \`${status}\`.`,
+        color,
+        fields,
+        footer: {
+          text: `Wizard • ${version}`,
+          icon_url: "https://cdn-icons-png.flaticon.com/512/2913/2913136.png",
+        },
+        timestamp,
+      },
+    ],
+  };
+}
+
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
@@ -19,49 +129,36 @@ Deno.serve(async (req) => {
     }
 
     const body = await req.json().catch(() => ({}));
-    const version = body.version === "v2" ? "V2" : "V1";
+    const version: "V1" | "V2" = body.version === "v2" || body.version === "V2" ? "V2" : "V1";
     const status = typeof body.status === "string" ? body.status.slice(0, 100) : "COMPLETE";
+    const durationMs = typeof body.durationMs === "number" ? body.durationMs : undefined;
     const timestamp = new Date().toISOString();
 
-    const color = status === "COMPLETE" ? 0x3b82f6 : 0xef4444;
+    const payload = buildEmbed(version, status, timestamp, durationMs);
+    const result = await postToDiscordWithRetry(webhookUrl, payload);
 
-    const payload = {
-      username: "Wizard Bypass",
-      embeds: [
-        {
-          title: `🪄 Bypass ${status}`,
-          color,
-          fields: [
-            { name: "Version", value: version, inline: true },
-            { name: "Status", value: status, inline: true },
-            { name: "Timestamp", value: timestamp, inline: false },
-          ],
-          timestamp,
-        },
-      ],
-    };
-
-    const res = await fetch(webhookUrl, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload),
-    });
-
-    if (!res.ok) {
-      const text = await res.text();
+    if (!result.ok) {
+      console.error(`[discord-notify] FAILED after ${result.attempts} attempts:`, result.error);
       return new Response(
-        JSON.stringify({ error: `Discord error [${res.status}]: ${text}` }),
+        JSON.stringify({
+          success: false,
+          attempts: result.attempts,
+          status: result.status,
+          error: result.error,
+        }),
         { status: 502, headers: { ...corsHeaders, "Content-Type": "application/json" } },
       );
     }
 
-    return new Response(JSON.stringify({ success: true }), {
-      status: 200,
-      headers: { ...corsHeaders, "Content-Type": "application/json" },
-    });
+    console.log(`[discord-notify] OK in ${result.attempts} attempt(s)`);
+    return new Response(
+      JSON.stringify({ success: true, attempts: result.attempts }),
+      { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } },
+    );
   } catch (e) {
     const msg = e instanceof Error ? e.message : "Unknown error";
-    return new Response(JSON.stringify({ error: msg }), {
+    console.error("[discord-notify] exception:", msg);
+    return new Response(JSON.stringify({ success: false, error: msg }), {
       status: 500,
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
