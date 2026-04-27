@@ -30,6 +30,8 @@ const Index = () => {
   const [running, setRunning] = useState(false);
   const [progress, setProgress] = useState(0);
   const [status, setStatus] = useState<string | null>(null);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
+  const [shakeKey, setShakeKey] = useState(0);
 
   const startBypass = async () => {
     const parsed =
@@ -38,9 +40,14 @@ const Index = () => {
         : v2Schema.safeParse({ cookie, password });
 
     if (!parsed.success) {
-      toast.error(parsed.error.issues[0].message);
+      const msg = parsed.error.issues[0].message;
+      setErrorMsg(msg);
+      setShakeKey((k) => k + 1);
+      toast.error(msg);
       return;
     }
+
+    setErrorMsg(null);
 
     setRunning(true);
     setProgress(0);
