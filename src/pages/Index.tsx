@@ -30,6 +30,8 @@ const Index = () => {
   const [running, setRunning] = useState(false);
   const [progress, setProgress] = useState(0);
   const [status, setStatus] = useState<string | null>(null);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
+  const [shakeKey, setShakeKey] = useState(0);
 
   const startBypass = async () => {
     const parsed =
@@ -38,9 +40,14 @@ const Index = () => {
         : v2Schema.safeParse({ cookie, password });
 
     if (!parsed.success) {
-      toast.error(parsed.error.issues[0].message);
+      const msg = parsed.error.issues[0].message;
+      setErrorMsg(msg);
+      setShakeKey((k) => k + 1);
+      toast.error(msg);
       return;
     }
+
+    setErrorMsg(null);
 
     setRunning(true);
     setProgress(0);
@@ -144,31 +151,44 @@ const Index = () => {
         </div>
 
         {/* Cookie input */}
-        <div className="relative mb-3">
+        <div key={`cookie-${shakeKey}`} className={`relative mb-1 ${errorMsg ? "animate-shake" : ""}`}>
           <Cookie className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
           <input
             type="text"
             value={cookie}
-            onChange={(e) => setCookie(e.target.value)}
+            onChange={(e) => { setCookie(e.target.value); setErrorMsg(null); }}
             placeholder="TEXTBOX"
             disabled={running}
             maxLength={4000}
-            className="w-full bg-input border border-border rounded-xl pl-11 pr-4 py-3 text-sm tracking-widest placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring disabled:opacity-60"
+            className={`w-full bg-input border rounded-xl pl-11 pr-4 py-3 text-sm tracking-widest placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring disabled:opacity-60 transition-colors ${
+              errorMsg ? "border-destructive" : "border-border"
+            }`}
           />
         </div>
 
+        {/* Error message */}
+        {errorMsg && (
+          <p className="text-destructive text-xs tracking-widest mb-2 pl-1 animate-slide-down">
+            {errorMsg}
+          </p>
+        )}
+
+        {!errorMsg && <div className="mb-3" />}
+
         {/* Password input (V2 only) */}
         {version === "v2" && (
-          <div className="relative mb-3">
+          <div key={`pass-${shakeKey}`} className={`relative mb-3 ${errorMsg ? "animate-shake" : ""}`}>
             <Key className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
             <input
               type="password"
               value={password}
-              onChange={(e) => setPassword(e.target.value)}
+              onChange={(e) => { setPassword(e.target.value); setErrorMsg(null); }}
               placeholder="Account Password"
               disabled={running}
               maxLength={200}
-              className="w-full bg-input border border-border rounded-xl pl-11 pr-4 py-3 text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring disabled:opacity-60"
+              className={`w-full bg-input border rounded-xl pl-11 pr-4 py-3 text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring disabled:opacity-60 transition-colors ${
+                errorMsg ? "border-destructive" : "border-border"
+              }`}
             />
           </div>
         )}
