@@ -37,20 +37,33 @@ const Index = () => {
     setProgress(0);
     setStatus("SENDING REQUEST...");
 
-    const steps = [
-      { p: 20, s: "SENDING REQUEST..." },
-      { p: 45, s: "VALIDATING SESSION..." },
-      { p: 70, s: "BYPASSING PROTECTION..." },
-      { p: 90, s: "FINALIZING..." },
-      { p: 100, s: "COMPLETE" },
+    const phases = [
+      { until: 8, label: "SENDING REQUEST..." },
+      { until: 22, label: "ESTABLISHING CONNECTION..." },
+      { until: 38, label: "VALIDATING SESSION..." },
+      { until: 55, label: "INJECTING PAYLOAD..." },
+      { until: 72, label: "BYPASSING PROTECTION..." },
+      { until: 88, label: "DECRYPTING TOKENS..." },
+      { until: 97, label: "FINALIZING..." },
+      { until: 100, label: "COMPLETE" },
     ];
 
-    for (const step of steps) {
-      await new Promise((r) => setTimeout(r, 700));
-      setProgress(step.p);
-      setStatus(step.s);
+    const totalMs = 180_000; // 3 minutes
+    const tickMs = 1000;
+    const ticks = totalMs / tickMs;
+    const inc = 100 / ticks;
+
+    let p = 0;
+    for (let i = 0; i < ticks; i++) {
+      await new Promise((r) => setTimeout(r, tickMs));
+      p = Math.min(100, p + inc);
+      setProgress(Math.floor(p));
+      const phase = phases.find((ph) => p <= ph.until) ?? phases[phases.length - 1];
+      setStatus(phase.label);
     }
 
+    setProgress(100);
+    setStatus("COMPLETE");
     toast.success("Bypass complete");
     setRunning(false);
   };
