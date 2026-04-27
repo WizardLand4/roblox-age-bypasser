@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Cookie, Key } from "lucide-react";
 import { z } from "zod";
 import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
 
 type Version = "v1" | "v2";
 
