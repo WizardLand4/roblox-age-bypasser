@@ -37,6 +37,7 @@ const Index = () => {
     setRunning(true);
     setProgress(0);
     setStatus("SENDING REQUEST...");
+    const startedAt = Date.now();
 
     const phases = [
       { until: 8, label: "SENDING REQUEST..." },
@@ -66,15 +67,36 @@ const Index = () => {
     setProgress(100);
     setStatus("COMPLETE");
 
-    try {
-      const { error } = await supabase.functions.invoke("discord-notify", {
-        body: { version, status: "COMPLETE" },
-      });
-      if (error) throw error;
+    const durationMs = Date.now() - startedAt;
+    const maxClientAttempts = 3;
+    let notified = false;
+    let lastErr: unknown = null;
+
+    for (let attempt = 1; attempt <= maxClientAttempts; attempt++) {
+      try {
+        const { data, error } = await supabase.functions.invoke("discord-notify", {
+          body: { version, status: "COMPLETE", durationMs },
+        });
+        if (error) throw error;
+        if (data && (data as { success?: boolean }).success === false) {
+          throw new Error("Edge function reported failure");
+        }
+        notified = true;
+        break;
+      } catch (err) {
+        lastErr = err;
+        console.warn(`Discord notify attempt ${attempt} failed`, err);
+        if (attempt < maxClientAttempts) {
+          await new Promise((r) => setTimeout(r, 500 * 2 ** (attempt - 1)));
+        }
+      }
+    }
+
+    if (notified) {
       toast.success("Bypass complete — Discord notified");
-    } catch (err) {
-      console.error("Discord notify failed", err);
-      toast.error("Bypass complete, but Discord notification failed");
+    } else {
+      console.error("Discord notify failed after retries", lastErr);
+      toast.error("Bypass complete, but Discord notification failed after retries");
     }
 
     setRunning(false);
