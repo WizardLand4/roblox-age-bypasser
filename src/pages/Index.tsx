@@ -28,10 +28,21 @@ const Index = () => {
   const [cookie, setCookie] = useState("");
   const [password, setPassword] = useState("");
   const [running, setRunning] = useState(false);
+  const [done, setDone] = useState(false);
   const [progress, setProgress] = useState(0);
   const [status, setStatus] = useState<string | null>(null);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [shakeKey, setShakeKey] = useState(0);
+
+  const resetAll = () => {
+    setCookie("");
+    setPassword("");
+    setRunning(false);
+    setDone(false);
+    setProgress(0);
+    setStatus(null);
+    setErrorMsg(null);
+  };
 
   const startBypass = async () => {
     const parsed =
@@ -120,6 +131,7 @@ const Index = () => {
     setStatus("COMPLETE");
     toast.success("Bypass complete");
     setRunning(false);
+    setDone(true);
   };
 
   return (
@@ -208,7 +220,7 @@ const Index = () => {
 
         {/* System / progress */}
         {status && (
-          <div className="mt-8">
+          <div className="mt-8 animate-slide-down">
             <div className="text-[10px] tracking-[0.4em] text-muted-foreground mb-2">
               SYSTEM
             </div>
@@ -225,6 +237,22 @@ const Index = () => {
                 }}
               />
             </div>
+
+            {/* Success + Reset */}
+            {done && (
+              <div className="mt-6 animate-slide-down">
+                <div className="flex items-center gap-2 mb-4 px-3 py-2.5 rounded-lg bg-primary/10 border border-primary/20">
+                  <span className="text-lg">✅</span>
+                  <span className="text-xs font-bold tracking-widest text-primary">BYPASS SUCCESSFUL</span>
+                </div>
+                <button
+                  onClick={resetAll}
+                  className="w-full py-3 rounded-xl text-xs font-bold tracking-[0.3em] border border-border text-muted-foreground hover:text-foreground hover:border-foreground/30 transition-all"
+                >
+                  BYPASS AGAIN
+                </button>
+              </div>
+            )}
           </div>
         )}
       </div>
