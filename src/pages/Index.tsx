@@ -237,15 +237,28 @@ const Index = () => {
         {!errorMsg && <div className="mb-3" />}
 
         {/* Password input (V2 only) */}
-        {version === "v2" && (
-          <div className="relative mb-3 animate-slide-down">
+        {/* Password input (V2 only) — smooth slide in/out */}
+        <div
+          className="overflow-hidden"
+          style={{
+            maxHeight: version === "v2" ? "120px" : "0px",
+            opacity: version === "v2" ? 1 : 0,
+            transform: version === "v2" ? "translateY(0)" : "translateY(-8px)",
+            marginBottom: version === "v2" ? "0.75rem" : "0rem",
+            transition:
+              "max-height 450ms cubic-bezier(0.4, 0, 0.2, 1), opacity 350ms cubic-bezier(0.4, 0, 0.2, 1), transform 450ms cubic-bezier(0.4, 0, 0.2, 1), margin-bottom 450ms cubic-bezier(0.4, 0, 0.2, 1)",
+          }}
+          aria-hidden={version !== "v2"}
+        >
+          <div className="relative">
             <Key className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
             <input
               type="password"
               value={password}
               onChange={(e) => { setPassword(e.target.value); setErrorMsg(null); }}
               placeholder="Account Password"
-              disabled={running}
+              disabled={running || version !== "v2"}
+              tabIndex={version === "v2" ? 0 : -1}
               maxLength={200}
               className={`w-full border rounded-xl pl-11 pr-4 py-3 text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring disabled:opacity-60 transition-colors ${
                 errorMsg ? "border-destructive" : ""
@@ -257,7 +270,7 @@ const Index = () => {
               }}
             />
           </div>
-        )}
+        </div>
 
         {/* Start button */}
         <button
