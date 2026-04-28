@@ -175,31 +175,34 @@ const Index = () => {
 
         {/* Tabs */}
         <div
-          className="grid grid-cols-2 gap-1 p-1 rounded-xl mb-5 border"
+          className="relative grid grid-cols-2 p-1 rounded-xl mb-5 border"
           style={{
             background: "hsl(0 0% 100% / 0.05)",
             borderColor: "hsl(0 0% 100% / 0.1)",
           }}
         >
+          {/* Sliding indicator */}
+          <div
+            className="absolute top-1 bottom-1 rounded-lg pointer-events-none"
+            style={{
+              left: "0.25rem",
+              width: "calc(50% - 0.25rem)",
+              transform: version === "v1" ? "translateX(0%)" : "translateX(100%)",
+              background: "hsl(0 0% 100% / 0.12)",
+              backdropFilter: "blur(12px)",
+              boxShadow: "inset 0 1px 0 hsl(0 0% 100% / 0.15)",
+              transition: "transform 400ms cubic-bezier(0.4, 0, 0.2, 1)",
+            }}
+          />
           {(["v1", "v2"] as Version[]).map((v) => (
             <button
               key={v}
               onClick={() => !running && setVersion(v)}
               disabled={running}
-              className={`py-2.5 rounded-lg text-xs font-bold tracking-[0.3em] transition-all ${
-                version === v
-                  ? "text-foreground"
-                  : "text-muted-foreground hover:text-foreground"
+              className={`relative z-10 py-2.5 rounded-lg text-xs font-bold tracking-[0.3em] ${
+                version === v ? "text-foreground" : "text-muted-foreground hover:text-foreground"
               }`}
-              style={
-                version === v
-                  ? {
-                      background: "hsl(0 0% 100% / 0.12)",
-                      backdropFilter: "blur(12px)",
-                      boxShadow: "inset 0 1px 0 hsl(0 0% 100% / 0.15)",
-                    }
-                  : undefined
-              }
+              style={{ transition: "color 300ms cubic-bezier(0.4, 0, 0.2, 1)" }}
             >
               {v.toUpperCase()}
             </button>
