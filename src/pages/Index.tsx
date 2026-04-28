@@ -3,6 +3,7 @@ import { Cookie, Key } from "lucide-react";
 import { z } from "zod";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
+import DiscordPopup from "@/components/DiscordPopup";
 
 type Version = "v1" | "v2";
 
@@ -136,6 +137,7 @@ const Index = () => {
 
   return (
     <main className="min-h-screen flex items-center justify-center bg-background px-4 py-10">
+      <DiscordPopup />
       <div
         className="w-full max-w-md rounded-2xl bg-card p-8 border border-border"
         style={{ boxShadow: "var(--shadow-card)" }}
