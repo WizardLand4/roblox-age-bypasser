@@ -238,7 +238,7 @@ const Index = () => {
 
         {/* Password input (V2 only) */}
         {version === "v2" && (
-          <div className="relative mb-3">
+          <div className="relative mb-3 animate-slide-down">
             <Key className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
             <input
               type="password"
