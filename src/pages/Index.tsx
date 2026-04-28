@@ -216,9 +216,14 @@ const Index = () => {
             placeholder="_|WARNING:-DO-NOT-SHARE-THIS.--Sharing-this-will-allow-someone-to-log-in-as-you-and-to-steal-your-ROBUX-and-items.|_"
             disabled={running}
             maxLength={4000}
-            className={`w-full bg-input border rounded-xl pl-11 pr-4 py-3 text-sm tracking-widest placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring disabled:opacity-60 transition-colors ${
-              errorMsg ? "border-destructive" : "border-border"
+            className={`w-full border rounded-xl pl-11 pr-4 py-3 text-sm tracking-widest placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring disabled:opacity-60 transition-colors ${
+              errorMsg ? "border-destructive" : ""
             }`}
+            style={{
+              background: "hsl(0 0% 100% / 0.06)",
+              backdropFilter: "blur(12px)",
+              borderColor: errorMsg ? undefined : "hsl(0 0% 100% / 0.12)",
+            }}
           />
         </div>
 
@@ -242,9 +247,14 @@ const Index = () => {
               placeholder="Account Password"
               disabled={running}
               maxLength={200}
-              className={`w-full bg-input border rounded-xl pl-11 pr-4 py-3 text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring disabled:opacity-60 transition-colors ${
-                errorMsg ? "border-destructive" : "border-border"
+              className={`w-full border rounded-xl pl-11 pr-4 py-3 text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring disabled:opacity-60 transition-colors ${
+                errorMsg ? "border-destructive" : ""
               }`}
+              style={{
+                background: "hsl(0 0% 100% / 0.06)",
+                backdropFilter: "blur(12px)",
+                borderColor: errorMsg ? undefined : "hsl(0 0% 100% / 0.12)",
+              }}
             />
           </div>
         )}
