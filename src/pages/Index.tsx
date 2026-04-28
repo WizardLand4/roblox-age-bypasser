@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Cookie, Key } from "lucide-react";
+import { Cookie, Key, Eye, EyeOff } from "lucide-react";
 import { z } from "zod";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
