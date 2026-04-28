@@ -63,10 +63,7 @@ const DiscordPopup = () => {
           </svg>
         </div>
 
-        <h2 className="text-lg font-bold tracking-[0.3em] mb-2">JOIN DISCORD</h2>
-        <p className="text-xs text-muted-foreground tracking-widest mb-6">
-          API · UPDATES · SUPPORT
-        </p>
+        <h2 className="text-lg font-bold tracking-[0.3em] mb-6">JOIN DISCORD</h2>
 
         <a
           href={DISCORD_INVITE}
