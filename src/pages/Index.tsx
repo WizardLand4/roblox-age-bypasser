@@ -4,6 +4,7 @@ import { z } from "zod";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import DiscordPopup from "@/components/DiscordPopup";
+import blackholeBg from "@/assets/blackhole-bg.mp4.asset.json";
 
 type Version = "v1" | "v2";
 
@@ -136,10 +137,28 @@ const Index = () => {
   };
 
   return (
-    <main className="min-h-screen flex items-center justify-center bg-background px-4 py-10">
+    <main className="relative min-h-screen flex items-center justify-center bg-background px-4 py-10 overflow-hidden">
+      {/* Black hole background video */}
+      <video
+        src={blackholeBg.url}
+        autoPlay
+        loop
+        muted
+        playsInline
+        aria-hidden="true"
+        className="absolute inset-0 w-full h-full object-cover z-0"
+      />
+      {/* Dark overlay for readability */}
+      <div
+        className="absolute inset-0 z-0"
+        style={{
+          background:
+            "radial-gradient(ellipse at center, hsl(0 0% 0% / 0.55) 0%, hsl(0 0% 0% / 0.85) 100%)",
+        }}
+      />
       <DiscordPopup />
       <div
-        className="w-full max-w-md rounded-2xl bg-card p-8 border border-border"
+        className="relative z-10 w-full max-w-md rounded-2xl bg-card/70 backdrop-blur-xl p-8 border border-border"
         style={{ boxShadow: "var(--shadow-card)" }}
       >
         <h1 className="text-center text-2xl font-bold tracking-[0.4em] mb-8">
