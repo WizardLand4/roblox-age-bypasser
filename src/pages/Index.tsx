@@ -35,6 +35,7 @@ const Index = () => {
   const [status, setStatus] = useState<string | null>(null);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [shakeKey, setShakeKey] = useState(0);
+  const [showPassword, setShowPassword] = useState(false);
 
   const resetAll = () => {
     setCookie("");
