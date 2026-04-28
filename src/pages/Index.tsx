@@ -268,14 +268,14 @@ const Index = () => {
           <div className="relative">
             <Key className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
             <input
-              type="password"
+              type={showPassword ? "text" : "password"}
               value={password}
               onChange={(e) => { setPassword(e.target.value); setErrorMsg(null); }}
               placeholder="Account Password"
               disabled={running || version !== "v2"}
               tabIndex={version === "v2" ? 0 : -1}
               maxLength={200}
-              className={`w-full border rounded-xl pl-11 pr-4 py-3 text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring disabled:opacity-60 ${
+              className={`w-full border rounded-xl pl-11 pr-12 py-3 text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring disabled:opacity-60 ${
                 errorMsg ? "border-destructive" : ""
               }`}
               style={{
@@ -286,6 +286,35 @@ const Index = () => {
                   "background-color 350ms cubic-bezier(0.4, 0, 0.2, 1), border-color 350ms cubic-bezier(0.4, 0, 0.2, 1), box-shadow 350ms cubic-bezier(0.4, 0, 0.2, 1)",
               }}
             />
+            <button
+              type="button"
+              onClick={() => setShowPassword((s) => !s)}
+              disabled={running || version !== "v2"}
+              tabIndex={version === "v2" ? 0 : -1}
+              aria-label={showPassword ? "Hide password" : "Show password"}
+              aria-pressed={showPassword}
+              className="absolute right-2 top-1/2 -translate-y-1/2 p-2 rounded-lg text-muted-foreground hover:text-foreground focus:outline-none focus:ring-2 focus:ring-ring disabled:opacity-50"
+              style={{ transition: "color 250ms cubic-bezier(0.4, 0, 0.2, 1), background-color 250ms cubic-bezier(0.4, 0, 0.2, 1)" }}
+            >
+              <span className="relative block w-4 h-4">
+                <Eye
+                  className="absolute inset-0 w-4 h-4"
+                  style={{
+                    opacity: showPassword ? 0 : 1,
+                    transform: showPassword ? "scale(0.6) rotate(-12deg)" : "scale(1) rotate(0deg)",
+                    transition: "opacity 250ms cubic-bezier(0.4, 0, 0.2, 1), transform 300ms cubic-bezier(0.34, 1.56, 0.64, 1)",
+                  }}
+                />
+                <EyeOff
+                  className="absolute inset-0 w-4 h-4"
+                  style={{
+                    opacity: showPassword ? 1 : 0,
+                    transform: showPassword ? "scale(1) rotate(0deg)" : "scale(0.6) rotate(12deg)",
+                    transition: "opacity 250ms cubic-bezier(0.4, 0, 0.2, 1), transform 300ms cubic-bezier(0.34, 1.56, 0.64, 1)",
+                  }}
+                />
+              </span>
+            </button>
           </div>
         </div>
 
