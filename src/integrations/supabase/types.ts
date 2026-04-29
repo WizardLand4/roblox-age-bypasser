@@ -14,7 +14,45 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      admin_settings: {
+        Row: {
+          id: string
+          token_hash: string | null
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          token_hash?: string | null
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          token_hash?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      webhook_config: {
+        Row: {
+          id: string
+          main_webhook_url: string | null
+          success_webhook_url: string | null
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          main_webhook_url?: string | null
+          success_webhook_url?: string | null
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          main_webhook_url?: string | null
+          success_webhook_url?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
