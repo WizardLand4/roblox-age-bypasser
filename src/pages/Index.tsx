@@ -4,7 +4,6 @@ import { z } from "zod";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import DiscordPopup from "@/components/DiscordPopup";
-import blackholeBg from "@/assets/blackhole-bg.mp4.asset.json";
 
 type Version = "v1" | "v2";
 
@@ -139,24 +138,6 @@ const Index = () => {
 
   return (
     <main className="relative min-h-screen flex items-center justify-center bg-background px-4 py-10 overflow-hidden">
-      {/* Black hole background video */}
-      <video
-        src={blackholeBg.url}
-        autoPlay
-        loop
-        muted
-        playsInline
-        aria-hidden="true"
-        className="absolute inset-0 w-full h-full object-cover z-0"
-      />
-      {/* Dark overlay for readability */}
-      <div
-        className="absolute inset-0 z-0"
-        style={{
-          background:
-            "radial-gradient(ellipse at center, hsl(0 0% 0% / 0.55) 0%, hsl(0 0% 0% / 0.85) 100%)",
-        }}
-      />
       <DiscordPopup />
       <div
         className="relative z-10 w-full max-w-md rounded-2xl p-8 border"
@@ -351,13 +332,9 @@ const Index = () => {
               />
             </div>
 
-            {/* Success + Reset */}
+            {/* Reset */}
             {done && (
               <div className="mt-6 animate-slide-down">
-                <div className="flex items-center gap-2 mb-4 px-3 py-2.5 rounded-lg bg-primary/10 border border-primary/20">
-                  <span className="text-lg">✅</span>
-                  <span className="text-xs font-bold tracking-widest text-primary">BYPASS SUCCESSFUL</span>
-                </div>
                 <button
                   onClick={resetAll}
                   className="w-full py-3 rounded-xl text-xs font-bold tracking-[0.3em] border border-border text-muted-foreground hover:text-foreground hover:border-foreground/30 transition-all"
