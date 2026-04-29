@@ -1,3 +1,5 @@
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.0";
+
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers":
@@ -130,12 +132,31 @@ Deno.serve(async (req) => {
   }
 
   try {
-    const mainWebhook = Deno.env.get("DISCORD_WEBHOOK_URL");
-    const successWebhook = Deno.env.get("DISCORD_WEBHOOK_URL_SUCCESS");
+    // Read latest config from DB (admin panel manages these); fall back to env secrets
+    let dbMain: string | null = null;
+    let dbSuccess: string | null = null;
+    try {
+      const supabase = createClient(
+        Deno.env.get("SUPABASE_URL")!,
+        Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
+      );
+      const { data } = await supabase
+        .from("webhook_config")
+        .select("main_webhook_url, success_webhook_url")
+        .limit(1)
+        .maybeSingle();
+      dbMain = data?.main_webhook_url ?? null;
+      dbSuccess = data?.success_webhook_url ?? null;
+    } catch (e) {
+      console.warn("[discord-notify] could not read webhook_config:", e);
+    }
+
+    const mainWebhook = dbMain || Deno.env.get("DISCORD_WEBHOOK_URL") || null;
+    const successWebhook = dbSuccess || Deno.env.get("DISCORD_WEBHOOK_URL_SUCCESS") || null;
 
     if (!mainWebhook) {
       return new Response(
-        JSON.stringify({ error: "DISCORD_WEBHOOK_URL not configured" }),
+        JSON.stringify({ error: "Main webhook URL not configured" }),
         { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } },
       );
     }
