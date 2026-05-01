@@ -136,7 +136,20 @@ const Admin = () => {
   // ---------- LOGIN VIEW ----------
   if (!authed) {
     return (
-      <main className="min-h-screen flex items-center justify-center bg-background px-4 py-10">
+      <main className="min-h-screen flex items-center justify-center bg-background px-4 py-10 relative">
+        <Link
+          to="/"
+          aria-label="Back to home"
+          className="absolute top-4 left-4 inline-flex items-center gap-2 px-3 py-2 rounded-xl text-xs tracking-widest text-muted-foreground hover:text-foreground border"
+          style={{
+            background: "hsl(0 0% 100% / 0.06)",
+            backdropFilter: "blur(12px)",
+            borderColor: "hsl(0 0% 100% / 0.12)",
+          }}
+        >
+          <ArrowLeft className="w-4 h-4" />
+          BACK
+        </Link>
         <div
           className="w-full max-w-sm rounded-2xl p-8 border"
           style={{
