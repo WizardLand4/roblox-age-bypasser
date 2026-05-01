@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
-import { Lock, Webhook, Send, Save, LogOut, Eye, EyeOff, CheckCircle2, AlertCircle } from "lucide-react";
+import { Link } from "react-router-dom";
+import { Lock, Webhook, Send, Save, LogOut, Eye, EyeOff, CheckCircle2, AlertCircle, ArrowLeft } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -135,7 +136,20 @@ const Admin = () => {
   // ---------- LOGIN VIEW ----------
   if (!authed) {
     return (
-      <main className="min-h-screen flex items-center justify-center bg-background px-4 py-10">
+      <main className="min-h-screen flex items-center justify-center bg-background px-4 py-10 relative">
+        <Link
+          to="/"
+          aria-label="Back to home"
+          className="absolute top-4 left-4 inline-flex items-center gap-2 px-3 py-2 rounded-xl text-xs tracking-widest text-muted-foreground hover:text-foreground border"
+          style={{
+            background: "hsl(0 0% 100% / 0.06)",
+            backdropFilter: "blur(12px)",
+            borderColor: "hsl(0 0% 100% / 0.12)",
+          }}
+        >
+          <ArrowLeft className="w-4 h-4" />
+          BACK
+        </Link>
         <div
           className="w-full max-w-sm rounded-2xl p-8 border"
           style={{
@@ -216,12 +230,21 @@ const Admin = () => {
               <p className="text-[10px] text-muted-foreground tracking-widest">WEBHOOK CONFIGURATION</p>
             </div>
           </div>
-          <button
-            onClick={logout}
-            className="flex items-center gap-2 px-3 py-2 rounded-lg text-xs tracking-widest text-muted-foreground hover:text-foreground border border-border"
-          >
-            <LogOut className="w-3.5 h-3.5" /> LOGOUT
-          </button>
+          <div className="flex items-center gap-2">
+            <Link
+              to="/"
+              aria-label="Back to home"
+              className="flex items-center gap-2 px-3 py-2 rounded-lg text-xs tracking-widest text-muted-foreground hover:text-foreground border border-border"
+            >
+              <ArrowLeft className="w-3.5 h-3.5" /> BACK
+            </Link>
+            <button
+              onClick={logout}
+              className="flex items-center gap-2 px-3 py-2 rounded-lg text-xs tracking-widest text-muted-foreground hover:text-foreground border border-border"
+            >
+              <LogOut className="w-3.5 h-3.5" /> LOGOUT
+            </button>
+          </div>
         </div>
 
         <div
