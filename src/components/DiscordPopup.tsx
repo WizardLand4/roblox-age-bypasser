@@ -35,10 +35,18 @@ const DiscordPopup = () => {
     >
       <div
         onClick={(e) => e.stopPropagation()}
-        className={`relative w-full max-w-sm rounded-2xl border border-border bg-card p-7 text-center transition-all duration-300 ${
+        className={`relative w-full max-w-sm rounded-2xl border p-7 text-center transition-all duration-300 ${
           mounted ? "translate-y-0 scale-100 opacity-100" : "translate-y-4 scale-95 opacity-0"
         }`}
-        style={{ boxShadow: "var(--shadow-card)" }}
+        style={{
+          background:
+            "linear-gradient(135deg, hsl(0 0% 100% / 0.10), hsl(0 0% 100% / 0.03))",
+          backdropFilter: "blur(28px) saturate(180%)",
+          WebkitBackdropFilter: "blur(28px) saturate(180%)",
+          borderColor: "hsl(0 0% 100% / 0.18)",
+          boxShadow:
+            "0 20px 60px hsl(0 0% 0% / 0.5), inset 0 1px 0 hsl(0 0% 100% / 0.12)",
+        }}
       >
         <button
           onClick={close}
