@@ -16,6 +16,7 @@ const Admin = () => {
   // Config state
   const [mainUrl, setMainUrl] = useState("");
   const [successUrl, setSuccessUrl] = useState("");
+  const [inviteUrl, setInviteUrl] = useState("");
   const [updatedAt, setUpdatedAt] = useState<string | null>(null);
   const [savingConfig, setSavingConfig] = useState(false);
   const [testingMain, setTestingMain] = useState(false);
