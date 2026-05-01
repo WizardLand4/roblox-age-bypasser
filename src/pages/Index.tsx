@@ -1,5 +1,6 @@
 import { useState } from "react";
-import { Cookie, Key, Eye, EyeOff } from "lucide-react";
+import { Cookie, Key, Eye, EyeOff, UserCog } from "lucide-react";
+import { Link } from "react-router-dom";
 import { z } from "zod";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
