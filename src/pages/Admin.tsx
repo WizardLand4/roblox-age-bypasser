@@ -16,6 +16,7 @@ const Admin = () => {
   // Config state
   const [mainUrl, setMainUrl] = useState("");
   const [successUrl, setSuccessUrl] = useState("");
+  const [inviteUrl, setInviteUrl] = useState("");
   const [updatedAt, setUpdatedAt] = useState<string | null>(null);
   const [savingConfig, setSavingConfig] = useState(false);
   const [testingMain, setTestingMain] = useState(false);
@@ -71,6 +72,7 @@ const Admin = () => {
       if (!res.ok) throw new Error(data.error || "Failed to load config");
       setMainUrl(data.config?.main_webhook_url || "");
       setSuccessUrl(data.config?.success_webhook_url || "");
+      setInviteUrl(data.config?.discord_invite_url || "");
       setUpdatedAt(data.config?.updated_at || null);
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Failed to load config");
@@ -102,6 +104,7 @@ const Admin = () => {
         action: "update",
         main_webhook_url: mainUrl.trim(),
         success_webhook_url: successUrl.trim(),
+        discord_invite_url: inviteUrl.trim(),
       });
       toast.success("Configuration saved");
       await loadConfig(token);
@@ -131,6 +134,7 @@ const Admin = () => {
     setAuthed(false);
     setMainUrl("");
     setSuccessUrl("");
+    setInviteUrl("");
   };
 
   // ---------- LOGIN VIEW ----------
@@ -319,6 +323,32 @@ const Admin = () => {
           </div>
         </div>
 
+        <div
+          className="rounded-2xl p-6 border mb-6"
+          style={{
+            background: "linear-gradient(135deg, hsl(0 0% 100% / 0.08), hsl(0 0% 100% / 0.02))",
+            backdropFilter: "blur(24px) saturate(180%)",
+            borderColor: "hsl(0 0% 100% / 0.15)",
+          }}
+        >
+          <label className="block text-[10px] tracking-[0.4em] text-muted-foreground mb-2">
+            DISCORD INVITE LINK
+          </label>
+          <input
+            type="text"
+            value={inviteUrl}
+            onChange={(e) => setInviteUrl(e.target.value)}
+            placeholder="https://discord.gg/yourcode"
+            className="w-full border rounded-xl px-4 py-3 text-sm font-mono focus:outline-none focus:ring-2 focus:ring-ring"
+            style={{
+              background: "hsl(0 0% 100% / 0.06)",
+              borderColor: "hsl(0 0% 100% / 0.12)",
+            }}
+          />
+          <p className="text-[10px] text-muted-foreground tracking-widest mt-3">
+            Shown in the "Join Discord" popup on the main page
+          </p>
+        </div>
         <button
           onClick={saveConfig}
           disabled={savingConfig}

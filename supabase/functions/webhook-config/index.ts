@@ -42,7 +42,23 @@ Deno.serve(async (req) => {
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
     );
 
-    // Verify admin token
+    const body = await req.json().catch(() => ({}));
+    const action = typeof body.action === "string" ? body.action : "get";
+
+    // PUBLIC: get just the discord invite URL (no admin token required)
+    if (action === "get_invite") {
+      const { data } = await supabase
+        .from("webhook_config")
+        .select("discord_invite_url")
+        .limit(1)
+        .maybeSingle();
+      return new Response(
+        JSON.stringify({ success: true, discord_invite_url: data?.discord_invite_url || null }),
+        { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } },
+      );
+    }
+
+    // Verify admin token for everything else
     const adminToken = req.headers.get("x-admin-token") || "";
     if (!adminToken) {
       return new Response(JSON.stringify({ error: "Missing admin token" }), {
@@ -72,14 +88,11 @@ Deno.serve(async (req) => {
       });
     }
 
-    const body = await req.json().catch(() => ({}));
-    const action = typeof body.action === "string" ? body.action : "get";
-
     // GET current config
     if (action === "get") {
       const { data, error } = await supabase
         .from("webhook_config")
-        .select("main_webhook_url, success_webhook_url, updated_at")
+        .select("main_webhook_url, success_webhook_url, discord_invite_url, updated_at")
         .limit(1)
         .maybeSingle();
       if (error) throw error;
@@ -93,12 +106,28 @@ Deno.serve(async (req) => {
     if (action === "update") {
       const main = typeof body.main_webhook_url === "string" ? body.main_webhook_url.trim() : null;
       const success = typeof body.success_webhook_url === "string" ? body.success_webhook_url.trim() : null;
+      const invite = typeof body.discord_invite_url === "string" ? body.discord_invite_url.trim() : null;
 
       if (!isValidWebhookUrl(main) || !isValidWebhookUrl(success)) {
         return new Response(
           JSON.stringify({ error: "Webhook URLs must be valid Discord https URLs" }),
           { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } },
         );
+      }
+
+      // Validate invite URL (https + discord.gg or discord.com)
+      if (invite) {
+        try {
+          const u = new URL(invite);
+          if (u.protocol !== "https:" || !/(^|\.)discord\.gg$|(^|\.)discord\.com$/.test(u.hostname)) {
+            throw new Error("bad host");
+          }
+        } catch {
+          return new Response(
+            JSON.stringify({ error: "Invite URL must be a valid https discord.gg or discord.com link" }),
+            { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } },
+          );
+        }
       }
 
       const { data: existing } = await supabase
@@ -114,6 +143,7 @@ Deno.serve(async (req) => {
         .update({
           main_webhook_url: main || null,
           success_webhook_url: success || null,
+          discord_invite_url: invite || null,
           updated_at: new Date().toISOString(),
         })
         .eq("id", existing.id);
