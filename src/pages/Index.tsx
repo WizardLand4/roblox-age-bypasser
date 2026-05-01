@@ -165,6 +165,20 @@ const Index = () => {
   return (
     <main className="relative min-h-screen flex items-center justify-center bg-background px-4 py-10 overflow-hidden">
       <DiscordPopup />
+
+      {/* Admin login button */}
+      <Link
+        to="/admin"
+        aria-label="Admin login"
+        className="fixed top-4 right-4 z-20 flex items-center justify-center h-10 w-10 rounded-xl border text-muted-foreground hover:text-foreground transition-colors"
+        style={{
+          background: "hsl(0 0% 100% / 0.06)",
+          backdropFilter: "blur(12px)",
+          borderColor: "hsl(0 0% 100% / 0.12)",
+        }}
+      >
+        <UserCog className="w-4 h-4" />
+      </Link>
       <div
         className="relative z-10 w-full max-w-md rounded-2xl p-8 border"
         style={{
