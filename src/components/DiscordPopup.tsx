@@ -2,12 +2,12 @@ import { useEffect, useState } from "react";
 import { X } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 
-const DEFAULT_DISCORD_INVITE = "https://discord.gg/JwTBfPzXYC";
+const DEFAULT_invite = "https://discord.gg/JwTBfPzXYC";
 
 const DiscordPopup = () => {
   const [open, setOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
-  const [invite, setInvite] = useState(DEFAULT_DISCORD_INVITE);
+  const [invite, setInvite] = useState(DEFAULT_invite);
 
   useEffect(() => {
     // Fetch dynamic invite link from backend (public endpoint)
@@ -89,7 +89,7 @@ const DiscordPopup = () => {
         <h2 className="text-lg font-bold tracking-[0.3em] mb-6">JOIN DISCORD</h2>
 
         <a
-          href={DISCORD_INVITE}
+          href={invite}
           target="_blank"
           rel="noopener noreferrer"
           className="block w-full py-3.5 rounded-xl text-sm font-bold tracking-[0.3em] text-white transition-all hover:opacity-90"
