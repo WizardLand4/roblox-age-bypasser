@@ -164,6 +164,31 @@ const Index = () => {
 
   return (
     <main className="relative min-h-screen flex items-center justify-center bg-background px-4 py-10 overflow-hidden">
+      {/* Ambient glass background */}
+      <div aria-hidden className="pointer-events-none absolute inset-0 z-0">
+        <div
+          className="absolute -top-32 -left-24 h-[28rem] w-[28rem] rounded-full opacity-60"
+          style={{
+            background: "radial-gradient(closest-side, hsl(var(--primary) / 0.45), transparent 70%)",
+            filter: "blur(60px)",
+          }}
+        />
+        <div
+          className="absolute -bottom-32 -right-24 h-[32rem] w-[32rem] rounded-full opacity-50"
+          style={{
+            background: "radial-gradient(closest-side, hsl(280 90% 60% / 0.35), transparent 70%)",
+            filter: "blur(70px)",
+          }}
+        />
+        <div
+          className="absolute top-1/3 left-1/2 -translate-x-1/2 h-72 w-72 rounded-full opacity-40"
+          style={{
+            background: "radial-gradient(closest-side, hsl(200 90% 55% / 0.35), transparent 70%)",
+            filter: "blur(80px)",
+          }}
+        />
+      </div>
+
       <DiscordPopup />
 
       {/* Admin login button */}
