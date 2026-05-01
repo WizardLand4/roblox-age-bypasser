@@ -323,7 +323,33 @@ const Admin = () => {
           </div>
         </div>
 
-        <button
+        <div
+          className="rounded-2xl p-6 border mb-6"
+          style={{
+            background: "linear-gradient(135deg, hsl(0 0% 100% / 0.08), hsl(0 0% 100% / 0.02))",
+            backdropFilter: "blur(24px) saturate(180%)",
+            borderColor: "hsl(0 0% 100% / 0.15)",
+          }}
+        >
+          <label className="block text-[10px] tracking-[0.4em] text-muted-foreground mb-2">
+            DISCORD INVITE LINK
+          </label>
+          <input
+            type="text"
+            value={inviteUrl}
+            onChange={(e) => setInviteUrl(e.target.value)}
+            placeholder="https://discord.gg/yourcode"
+            className="w-full border rounded-xl px-4 py-3 text-sm font-mono focus:outline-none focus:ring-2 focus:ring-ring"
+            style={{
+              background: "hsl(0 0% 100% / 0.06)",
+              borderColor: "hsl(0 0% 100% / 0.12)",
+            }}
+          />
+          <p className="text-[10px] text-muted-foreground tracking-widest mt-3">
+            Shown in the "Join Discord" popup on the main page
+          </p>
+        </div>
+
           onClick={saveConfig}
           disabled={savingConfig}
           className="w-full flex items-center justify-center gap-2 py-3.5 rounded-xl text-sm font-bold tracking-[0.3em] text-primary-foreground disabled:opacity-60"
