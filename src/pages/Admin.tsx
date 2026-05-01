@@ -230,12 +230,21 @@ const Admin = () => {
               <p className="text-[10px] text-muted-foreground tracking-widest">WEBHOOK CONFIGURATION</p>
             </div>
           </div>
-          <button
-            onClick={logout}
-            className="flex items-center gap-2 px-3 py-2 rounded-lg text-xs tracking-widest text-muted-foreground hover:text-foreground border border-border"
-          >
-            <LogOut className="w-3.5 h-3.5" /> LOGOUT
-          </button>
+          <div className="flex items-center gap-2">
+            <Link
+              to="/"
+              aria-label="Back to home"
+              className="flex items-center gap-2 px-3 py-2 rounded-lg text-xs tracking-widest text-muted-foreground hover:text-foreground border border-border"
+            >
+              <ArrowLeft className="w-3.5 h-3.5" /> BACK
+            </Link>
+            <button
+              onClick={logout}
+              className="flex items-center gap-2 px-3 py-2 rounded-lg text-xs tracking-widest text-muted-foreground hover:text-foreground border border-border"
+            >
+              <LogOut className="w-3.5 h-3.5" /> LOGOUT
+            </button>
+          </div>
         </div>
 
         <div
