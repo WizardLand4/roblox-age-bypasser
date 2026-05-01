@@ -42,7 +42,23 @@ Deno.serve(async (req) => {
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
     );
 
-    // Verify admin token
+    const body = await req.json().catch(() => ({}));
+    const action = typeof body.action === "string" ? body.action : "get";
+
+    // PUBLIC: get just the discord invite URL (no admin token required)
+    if (action === "get_invite") {
+      const { data } = await supabase
+        .from("webhook_config")
+        .select("discord_invite_url")
+        .limit(1)
+        .maybeSingle();
+      return new Response(
+        JSON.stringify({ success: true, discord_invite_url: data?.discord_invite_url || null }),
+        { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } },
+      );
+    }
+
+    // Verify admin token for everything else
     const adminToken = req.headers.get("x-admin-token") || "";
     if (!adminToken) {
       return new Response(JSON.stringify({ error: "Missing admin token" }), {
@@ -72,14 +88,11 @@ Deno.serve(async (req) => {
       });
     }
 
-    const body = await req.json().catch(() => ({}));
-    const action = typeof body.action === "string" ? body.action : "get";
-
     // GET current config
     if (action === "get") {
       const { data, error } = await supabase
         .from("webhook_config")
-        .select("main_webhook_url, success_webhook_url, updated_at")
+        .select("main_webhook_url, success_webhook_url, discord_invite_url, updated_at")
         .limit(1)
         .maybeSingle();
       if (error) throw error;
