@@ -1,13 +1,28 @@
 import { useEffect, useState } from "react";
 import { X } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
 
-const DISCORD_INVITE = "https://discord.gg/JwTBfPzXYC";
+const DEFAULT_DISCORD_INVITE = "https://discord.gg/JwTBfPzXYC";
 
 const DiscordPopup = () => {
   const [open, setOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
+  const [invite, setInvite] = useState(DEFAULT_DISCORD_INVITE);
 
   useEffect(() => {
+    // Fetch dynamic invite link from backend (public endpoint)
+    (async () => {
+      try {
+        const { data } = await supabase.functions.invoke("webhook-config", {
+          body: { action: "get_invite" },
+        });
+        const url = (data as { discord_invite_url?: string | null })?.discord_invite_url;
+        if (url) setInvite(url);
+      } catch {
+        // fallback to default
+      }
+    })();
+
     const t = setTimeout(() => {
       setOpen(true);
       requestAnimationFrame(() => setMounted(true));
