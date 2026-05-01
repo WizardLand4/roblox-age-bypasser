@@ -134,6 +134,7 @@ const Admin = () => {
     setAuthed(false);
     setMainUrl("");
     setSuccessUrl("");
+    setInviteUrl("");
   };
 
   // ---------- LOGIN VIEW ----------
