@@ -155,7 +155,7 @@ const Admin = () => {
           </div>
           <h1 className="text-center text-xl font-bold tracking-[0.4em] mb-2">ADMIN</h1>
           <p className="text-center text-xs text-muted-foreground tracking-widest mb-6">
-            {needsSetup ? "FIRST-TIME SETUP" : "TOKEN LOGIN"}
+            TOKEN LOGIN
           </p>
 
           <div className="relative mb-3">
@@ -164,7 +164,7 @@ const Admin = () => {
               type={showToken ? "text" : "password"}
               value={token}
               onChange={(e) => setToken(e.target.value)}
-              placeholder={needsSetup ? "Create token (min 12 chars)" : "Admin token"}
+              placeholder="Admin token"
               maxLength={256}
               className="w-full border rounded-xl pl-11 pr-12 py-3 text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring"
               style={{
@@ -173,9 +173,7 @@ const Admin = () => {
                 borderColor: "hsl(0 0% 100% / 0.12)",
               }}
               onKeyDown={(e) => {
-                if (e.key === "Enter") {
-                  needsSetup ? setup() : verify(token, true);
-                }
+                if (e.key === "Enter") verify(token, true);
               }}
             />
             <button
@@ -189,22 +187,13 @@ const Admin = () => {
           </div>
 
           <button
-            onClick={() => (needsSetup ? setup() : verify(token, true))}
+            onClick={() => verify(token, true)}
             disabled={loading || !token}
             className="w-full py-3.5 rounded-xl text-sm font-bold tracking-[0.3em] text-primary-foreground disabled:opacity-60"
             style={{ background: "var(--gradient-primary)", boxShadow: "var(--shadow-glow)" }}
           >
-            {loading ? "..." : needsSetup ? "CREATE TOKEN" : "LOGIN"}
+            {loading ? "..." : "LOGIN"}
           </button>
-
-          {!needsSetup && (
-            <button
-              onClick={() => setNeedsSetup(true)}
-              className="w-full mt-3 text-[10px] tracking-[0.3em] text-muted-foreground hover:text-foreground"
-            >
-              FIRST TIME? SETUP TOKEN
-            </button>
-          )}
         </div>
       </main>
     );
