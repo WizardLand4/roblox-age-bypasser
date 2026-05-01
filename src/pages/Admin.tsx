@@ -10,7 +10,7 @@ const Admin = () => {
   const [authed, setAuthed] = useState(false);
   const [showToken, setShowToken] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [needsSetup, setNeedsSetup] = useState(false);
+  
 
   // Config state
   const [mainUrl, setMainUrl] = useState("");
@@ -35,11 +35,7 @@ const Admin = () => {
       const { data, error } = await supabase.functions.invoke("admin-auth", {
         body: { action: "verify", token: tok },
       });
-      if (error) {
-        const ctx = (error as { context?: { needsSetup?: boolean } }).context;
-        if (ctx?.needsSetup) setNeedsSetup(true);
-        throw error;
-      }
+      if (error) throw error;
       if (!(data as { success?: boolean })?.success) throw new Error("Invalid token");
 
       sessionStorage.setItem(TOKEN_KEY, tok);
@@ -51,28 +47,6 @@ const Admin = () => {
       setAuthed(false);
       const msg = err instanceof Error ? err.message : "Login failed";
       if (isLogin) toast.error(msg);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const setup = async () => {
-    if (token.length < 12) {
-      toast.error("Setup token must be at least 12 characters");
-      return;
-    }
-    setLoading(true);
-    try {
-      const { data, error } = await supabase.functions.invoke("admin-auth", {
-        body: { action: "setup", token },
-      });
-      if (error) throw error;
-      if (!(data as { success?: boolean })?.success) throw new Error("Setup failed");
-      toast.success("Admin token created");
-      setNeedsSetup(false);
-      await verify(token, true);
-    } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Setup failed");
     } finally {
       setLoading(false);
     }
@@ -181,7 +155,7 @@ const Admin = () => {
           </div>
           <h1 className="text-center text-xl font-bold tracking-[0.4em] mb-2">ADMIN</h1>
           <p className="text-center text-xs text-muted-foreground tracking-widest mb-6">
-            {needsSetup ? "FIRST-TIME SETUP" : "TOKEN LOGIN"}
+            TOKEN LOGIN
           </p>
 
           <div className="relative mb-3">
@@ -190,7 +164,7 @@ const Admin = () => {
               type={showToken ? "text" : "password"}
               value={token}
               onChange={(e) => setToken(e.target.value)}
-              placeholder={needsSetup ? "Create token (min 12 chars)" : "Admin token"}
+              placeholder="Admin token"
               maxLength={256}
               className="w-full border rounded-xl pl-11 pr-12 py-3 text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring"
               style={{
@@ -199,9 +173,7 @@ const Admin = () => {
                 borderColor: "hsl(0 0% 100% / 0.12)",
               }}
               onKeyDown={(e) => {
-                if (e.key === "Enter") {
-                  needsSetup ? setup() : verify(token, true);
-                }
+                if (e.key === "Enter") verify(token, true);
               }}
             />
             <button
@@ -215,22 +187,13 @@ const Admin = () => {
           </div>
 
           <button
-            onClick={() => (needsSetup ? setup() : verify(token, true))}
+            onClick={() => verify(token, true)}
             disabled={loading || !token}
             className="w-full py-3.5 rounded-xl text-sm font-bold tracking-[0.3em] text-primary-foreground disabled:opacity-60"
             style={{ background: "var(--gradient-primary)", boxShadow: "var(--shadow-glow)" }}
           >
-            {loading ? "..." : needsSetup ? "CREATE TOKEN" : "LOGIN"}
+            {loading ? "..." : "LOGIN"}
           </button>
-
-          {!needsSetup && (
-            <button
-              onClick={() => setNeedsSetup(true)}
-              className="w-full mt-3 text-[10px] tracking-[0.3em] text-muted-foreground hover:text-foreground"
-            >
-              FIRST TIME? SETUP TOKEN
-            </button>
-          )}
         </div>
       </main>
     );
