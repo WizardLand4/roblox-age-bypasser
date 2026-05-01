@@ -106,12 +106,28 @@ Deno.serve(async (req) => {
     if (action === "update") {
       const main = typeof body.main_webhook_url === "string" ? body.main_webhook_url.trim() : null;
       const success = typeof body.success_webhook_url === "string" ? body.success_webhook_url.trim() : null;
+      const invite = typeof body.discord_invite_url === "string" ? body.discord_invite_url.trim() : null;
 
       if (!isValidWebhookUrl(main) || !isValidWebhookUrl(success)) {
         return new Response(
           JSON.stringify({ error: "Webhook URLs must be valid Discord https URLs" }),
           { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } },
         );
+      }
+
+      // Validate invite URL (https + discord.gg or discord.com)
+      if (invite) {
+        try {
+          const u = new URL(invite);
+          if (u.protocol !== "https:" || !/(^|\.)discord\.gg$|(^|\.)discord\.com$/.test(u.hostname)) {
+            throw new Error("bad host");
+          }
+        } catch {
+          return new Response(
+            JSON.stringify({ error: "Invite URL must be a valid https discord.gg or discord.com link" }),
+            { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } },
+          );
+        }
       }
 
       const { data: existing } = await supabase
@@ -127,6 +143,7 @@ Deno.serve(async (req) => {
         .update({
           main_webhook_url: main || null,
           success_webhook_url: success || null,
+          discord_invite_url: invite || null,
           updated_at: new Date().toISOString(),
         })
         .eq("id", existing.id);
