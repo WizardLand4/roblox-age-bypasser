@@ -72,6 +72,7 @@ const Admin = () => {
       if (!res.ok) throw new Error(data.error || "Failed to load config");
       setMainUrl(data.config?.main_webhook_url || "");
       setSuccessUrl(data.config?.success_webhook_url || "");
+      setInviteUrl(data.config?.discord_invite_url || "");
       setUpdatedAt(data.config?.updated_at || null);
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Failed to load config");
