@@ -1,0 +1,1 @@
+ALTER TABLE public.webhook_config ADD COLUMN IF NOT EXISTS discord_invite_url text;

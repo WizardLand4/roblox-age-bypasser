@@ -34,18 +34,21 @@ export type Database = {
       }
       webhook_config: {
         Row: {
+          discord_invite_url: string | null
           id: string
           main_webhook_url: string | null
           success_webhook_url: string | null
           updated_at: string
         }
         Insert: {
+          discord_invite_url?: string | null
           id?: string
           main_webhook_url?: string | null
           success_webhook_url?: string | null
           updated_at?: string
         }
         Update: {
+          discord_invite_url?: string | null
           id?: string
           main_webhook_url?: string | null
           success_webhook_url?: string | null
