@@ -349,7 +349,7 @@ const Admin = () => {
             Shown in the "Join Discord" popup on the main page
           </p>
         </div>
-
+        <button
           onClick={saveConfig}
           disabled={savingConfig}
           className="w-full flex items-center justify-center gap-2 py-3.5 rounded-xl text-sm font-bold tracking-[0.3em] text-primary-foreground disabled:opacity-60"
