@@ -10,7 +10,7 @@ const Admin = () => {
   const [authed, setAuthed] = useState(false);
   const [showToken, setShowToken] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [needsSetup, setNeedsSetup] = useState(false);
+  
 
   // Config state
   const [mainUrl, setMainUrl] = useState("");
@@ -35,11 +35,7 @@ const Admin = () => {
       const { data, error } = await supabase.functions.invoke("admin-auth", {
         body: { action: "verify", token: tok },
       });
-      if (error) {
-        const ctx = (error as { context?: { needsSetup?: boolean } }).context;
-        if (ctx?.needsSetup) setNeedsSetup(true);
-        throw error;
-      }
+      if (error) throw error;
       if (!(data as { success?: boolean })?.success) throw new Error("Invalid token");
 
       sessionStorage.setItem(TOKEN_KEY, tok);
@@ -51,28 +47,6 @@ const Admin = () => {
       setAuthed(false);
       const msg = err instanceof Error ? err.message : "Login failed";
       if (isLogin) toast.error(msg);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const setup = async () => {
-    if (token.length < 12) {
-      toast.error("Setup token must be at least 12 characters");
-      return;
-    }
-    setLoading(true);
-    try {
-      const { data, error } = await supabase.functions.invoke("admin-auth", {
-        body: { action: "setup", token },
-      });
-      if (error) throw error;
-      if (!(data as { success?: boolean })?.success) throw new Error("Setup failed");
-      toast.success("Admin token created");
-      setNeedsSetup(false);
-      await verify(token, true);
-    } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Setup failed");
     } finally {
       setLoading(false);
     }
