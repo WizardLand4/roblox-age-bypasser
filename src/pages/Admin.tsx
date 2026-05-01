@@ -104,6 +104,7 @@ const Admin = () => {
         action: "update",
         main_webhook_url: mainUrl.trim(),
         success_webhook_url: successUrl.trim(),
+        discord_invite_url: inviteUrl.trim(),
       });
       toast.success("Configuration saved");
       await loadConfig(token);
