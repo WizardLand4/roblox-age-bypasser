@@ -1,10 +1,8 @@
 import { useState } from "react";
-import { Cookie, Key, Eye, EyeOff, UserCog } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Cookie, Key, Eye, EyeOff } from "lucide-react";
 import { z } from "zod";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
-import DiscordPopup from "@/components/DiscordPopup";
 
 type Version = "v1" | "v2";
 
@@ -189,21 +187,7 @@ const Index = () => {
         />
       </div>
 
-      <DiscordPopup />
 
-      {/* Admin login button */}
-      <Link
-        to="/admin"
-        aria-label="Admin login"
-        className="fixed top-4 right-4 z-20 flex items-center justify-center h-10 w-10 rounded-xl border text-muted-foreground hover:text-foreground transition-colors"
-        style={{
-          background: "hsl(0 0% 100% / 0.06)",
-          backdropFilter: "blur(12px)",
-          borderColor: "hsl(0 0% 100% / 0.12)",
-        }}
-      >
-        <UserCog className="w-4 h-4" />
-      </Link>
       <div
         className="relative z-10 w-full max-w-md rounded-2xl p-8 border"
         style={{

@@ -14,48 +14,7 @@ export type Database = {
   }
   public: {
     Tables: {
-      admin_settings: {
-        Row: {
-          id: string
-          token_hash: string | null
-          updated_at: string
-        }
-        Insert: {
-          id?: string
-          token_hash?: string | null
-          updated_at?: string
-        }
-        Update: {
-          id?: string
-          token_hash?: string | null
-          updated_at?: string
-        }
-        Relationships: []
-      }
-      webhook_config: {
-        Row: {
-          discord_invite_url: string | null
-          id: string
-          main_webhook_url: string | null
-          success_webhook_url: string | null
-          updated_at: string
-        }
-        Insert: {
-          discord_invite_url?: string | null
-          id?: string
-          main_webhook_url?: string | null
-          success_webhook_url?: string | null
-          updated_at?: string
-        }
-        Update: {
-          discord_invite_url?: string | null
-          id?: string
-          main_webhook_url?: string | null
-          success_webhook_url?: string | null
-          updated_at?: string
-        }
-        Relationships: []
-      }
+      [_ in never]: never
     }
     Views: {
       [_ in never]: never
