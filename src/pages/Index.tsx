@@ -187,17 +187,56 @@ const Index = () => {
         />
       </div>
 
+      <div className="relative z-10 w-full max-w-6xl flex flex-col lg:flex-row items-center justify-center gap-10 lg:gap-16">
+        {/* Brand panel */}
+        <section className="flex-1 max-w-xl text-center lg:text-left">
+          <h1 className="text-5xl sm:text-6xl lg:text-7xl font-black tracking-tight text-foreground leading-none">
+            RBLXBYPASSER
+          </h1>
+          <div className="mt-4 flex items-center gap-3 justify-center lg:justify-start">
+            <span className="text-[10px] sm:text-xs tracking-[0.5em] text-primary font-semibold">
+              SINCE 2023
+            </span>
+            <span className="h-px w-16 bg-primary/70" />
+          </div>
 
-      <div
-        className="relative z-10 w-full max-w-md rounded-2xl p-8 border"
-        style={{
-          background:
-            "linear-gradient(135deg, hsl(0 0% 100% / 0.08), hsl(0 0% 100% / 0.02))",
-          backdropFilter: "blur(24px) saturate(180%)",
-          WebkitBackdropFilter: "blur(24px) saturate(180%)",
-          borderColor: "hsl(0 0% 100% / 0.15)",
-          boxShadow:
-            "0 8px 32px hsl(0 0% 0% / 0.4), inset 0 1px 0 hsl(0 0% 100% / 0.1)",
+          <div className="mt-10 flex justify-center lg:justify-start">
+            <div
+              className="w-full max-w-sm rounded-2xl border px-8 py-7 text-center"
+              style={{
+                background: "linear-gradient(135deg, hsl(0 0% 100% / 0.06), hsl(0 0% 100% / 0.02))",
+                backdropFilter: "blur(24px) saturate(180%)",
+                WebkitBackdropFilter: "blur(24px) saturate(180%)",
+                borderColor: "hsl(0 0% 100% / 0.12)",
+                boxShadow: "0 8px 32px hsl(0 0% 0% / 0.4), inset 0 1px 0 hsl(0 0% 100% / 0.08)",
+              }}
+            >
+              <div className="text-[10px] tracking-[0.5em] text-muted-foreground mb-3">
+                IMPACT
+              </div>
+              <div
+                className="text-4xl sm:text-5xl font-bold text-foreground tracking-tight"
+                style={{ textShadow: "0 0 24px hsl(var(--primary) / 0.35)" }}
+              >
+                104,942
+              </div>
+              <div className="text-[10px] tracking-[0.5em] text-muted-foreground mt-3">
+                BYPASSED
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <div
+          className="w-full max-w-md rounded-2xl p-8 border"
+          style={{
+            background:
+              "linear-gradient(135deg, hsl(0 0% 100% / 0.08), hsl(0 0% 100% / 0.02))",
+            backdropFilter: "blur(24px) saturate(180%)",
+            WebkitBackdropFilter: "blur(24px) saturate(180%)",
+            borderColor: "hsl(0 0% 100% / 0.15)",
+            boxShadow:
+              "0 8px 32px hsl(0 0% 0% / 0.4), inset 0 1px 0 hsl(0 0% 100% / 0.1)",
         }}
       >
         <h1 className="text-center text-2xl font-bold tracking-[0.4em] mb-8">
