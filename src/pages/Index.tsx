@@ -227,6 +227,16 @@ const Index = () => {
           </div>
         </section>
 
+        {/* Vertical divider */}
+        <div
+          aria-hidden
+          className="hidden lg:block self-stretch w-px"
+          style={{
+            background:
+              "linear-gradient(to bottom, transparent, hsl(0 0% 100% / 0.18), transparent)",
+          }}
+        />
+
         <div
           className="w-full max-w-md rounded-2xl p-8 border"
           style={{
