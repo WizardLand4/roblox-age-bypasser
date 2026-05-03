@@ -165,26 +165,24 @@ const Index = () => {
 
       <div className="relative z-10 w-full max-w-6xl flex flex-col lg:flex-row-reverse items-center justify-center gap-16 lg:gap-32">
         {/* Brand panel */}
-        <section className="flex-1 max-w-xl text-center lg:text-left">
+        <section className="flex-1 max-w-xl text-center">
           <h1 className="text-5xl sm:text-6xl lg:text-7xl font-black tracking-tight text-foreground leading-none">
             RBLXBYPASSER
           </h1>
-          <div className="mt-4 flex items-center gap-3 justify-center lg:justify-start">
+          <div className="mt-3 flex flex-col items-center gap-2">
             <span className="text-[10px] sm:text-xs tracking-[0.5em] text-primary font-semibold">
               SINCE 2023
             </span>
-            <span className="h-px w-16 bg-primary/70" />
+            <span className="h-px w-24 bg-primary/70" />
           </div>
 
-          <div className="mt-10 flex justify-center lg:justify-start">
+          <div className="mt-10 flex justify-center">
             <div
-              className="w-full max-w-sm rounded-2xl border px-8 py-7 text-center"
+              className="w-full max-w-xs rounded-2xl border px-8 py-7 text-center"
               style={{
-                background: "linear-gradient(135deg, hsl(0 0% 100% / 0.06), hsl(0 0% 100% / 0.02))",
-                backdropFilter: "blur(24px) saturate(180%)",
-                WebkitBackdropFilter: "blur(24px) saturate(180%)",
-                borderColor: "hsl(0 0% 100% / 0.12)",
-                boxShadow: "0 8px 32px hsl(0 0% 0% / 0.4), inset 0 1px 0 hsl(0 0% 100% / 0.08)",
+                background: "hsl(0 0% 4%)",
+                borderColor: "hsl(0 0% 12%)",
+                boxShadow: "0 8px 32px hsl(0 0% 0% / 0.6)",
               }}
             >
               <div className="text-[10px] tracking-[0.5em] text-muted-foreground mb-3">
@@ -192,7 +190,7 @@ const Index = () => {
               </div>
               <div
                 className="text-4xl sm:text-5xl font-bold text-foreground tracking-tight"
-                style={{ textShadow: "0 0 24px hsl(var(--primary) / 0.35)" }}
+                style={{ textShadow: "0 0 28px hsl(var(--primary) / 0.5)" }}
               >
                 104,942
               </div>
