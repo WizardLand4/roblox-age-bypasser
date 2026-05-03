@@ -163,7 +163,7 @@ const Index = () => {
   return (
     <main className="relative min-h-screen flex items-center justify-center bg-background px-4 py-10 overflow-hidden">
 
-      <div className="relative z-10 w-full max-w-6xl flex flex-col lg:flex-row items-center justify-center gap-10 lg:gap-16">
+      <div className="relative z-10 w-full max-w-6xl flex flex-col lg:flex-row-reverse items-center justify-center gap-16 lg:gap-32">
         {/* Brand panel */}
         <section className="flex-1 max-w-xl text-center lg:text-left">
           <h1 className="text-5xl sm:text-6xl lg:text-7xl font-black tracking-tight text-foreground leading-none">
