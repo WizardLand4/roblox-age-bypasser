@@ -165,7 +165,7 @@ const Index = () => {
 
       <div className="relative z-10 w-full max-w-6xl flex flex-col lg:flex-row-reverse items-center justify-center gap-16 lg:gap-32">
         {/* Brand panel */}
-        <section className="flex-1 max-w-xl text-center">
+        <section className="hidden lg:block flex-1 max-w-xl text-center">
           <h1 className="text-5xl sm:text-6xl lg:text-7xl font-black tracking-tight text-foreground leading-none">
             RBLXBYPASSER
           </h1>
