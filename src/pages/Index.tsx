@@ -360,7 +360,7 @@ const Index = () => {
             boxShadow: "var(--shadow-glow)",
           }}
         >
-          {running ? "RUNNING..." : "START BYPASS"}
+          {running ? "RUNNING..." : "INITIATE BYPASS"}
         </button>
 
         {/* System / progress */}
