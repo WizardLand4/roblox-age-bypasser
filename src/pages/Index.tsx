@@ -298,7 +298,7 @@ const Index = () => {
           aria-hidden={version !== "v2"}
         >
           <div className="relative">
-            <Key className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+            <Key className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-foreground/70 z-10" />
             <input
               type={showPassword ? "text" : "password"}
               value={password}
