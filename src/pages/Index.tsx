@@ -251,7 +251,7 @@ const Index = () => {
           }}
         >
           <Cookie
-            className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground"
+            className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-foreground/70 z-10"
             style={{ transition: "color 300ms cubic-bezier(0.4, 0, 0.2, 1)" }}
           />
           <input
