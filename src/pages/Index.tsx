@@ -203,31 +203,10 @@ const Index = () => {
           </div>
         </section>
 
-        {/* Vertical divider */}
-        <div
-          aria-hidden
-          className="hidden lg:block self-stretch w-px"
-          style={{
-            background:
-              "linear-gradient(to bottom, transparent, hsl(0 0% 100% / 0.18), transparent)",
-          }}
-        />
-
-        <div
-          className="w-full max-w-md rounded-2xl p-8 border"
-          style={{
-            background:
-              "linear-gradient(135deg, hsl(0 0% 100% / 0.08), hsl(0 0% 100% / 0.02))",
-            backdropFilter: "blur(24px) saturate(180%)",
-            WebkitBackdropFilter: "blur(24px) saturate(180%)",
-            borderColor: "hsl(0 0% 100% / 0.15)",
-            boxShadow:
-              "0 8px 32px hsl(0 0% 0% / 0.4), inset 0 1px 0 hsl(0 0% 100% / 0.1)",
-        }}
-      >
-        <h1 className="text-center text-2xl font-bold tracking-[0.4em] mb-8">
-          WIZARD
-        </h1>
+        <div className="w-full max-w-md p-2">
+          <h1 className="text-center text-sm font-bold tracking-[0.4em] mb-8 text-foreground">
+            ACCOUNT BYPASSER
+          </h1>
 
         {/* Tabs */}
         <div
