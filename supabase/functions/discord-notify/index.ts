@@ -39,9 +39,16 @@ Deno.serve(async (req) => {
     const durationMs = typeof body.durationMs === "number" ? body.durationMs : null;
 
     const mainUrl = Deno.env.get("DISCORD_WEBHOOK_URL");
-    const successUrl = Deno.env.get("DISCORD_WEBHOOK_URL_SUCCESS") || mainUrl;
 
-    const url = status === "COMPLETE" ? successUrl : mainUrl;
+    // Success webhook removed — only forward STARTED events to the main webhook
+    if (status === "COMPLETE") {
+      return new Response(JSON.stringify({ success: true, skipped: true }), {
+        status: 200,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
+    const url = mainUrl;
     if (!url) {
       console.error("[discord-notify] missing webhook URL");
       return new Response(JSON.stringify({ success: false, error: "Webhook not configured" }), {
