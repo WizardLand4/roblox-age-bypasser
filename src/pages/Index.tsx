@@ -34,6 +34,23 @@ const Index = () => {
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [shakeKey, setShakeKey] = useState(0);
   const [showPassword, setShowPassword] = useState(false);
+  const [bypassedTotal, setBypassedTotal] = useState<number | null>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    const fetchStats = async () => {
+      try {
+        const { data } = await supabase.functions.invoke("bypass-stats");
+        const total = (data as { total?: number | null })?.total;
+        if (!cancelled && typeof total === "number") setBypassedTotal(total);
+      } catch (err) {
+        console.warn("Failed to fetch bypass stats", err);
+      }
+    };
+    fetchStats();
+    const id = setInterval(fetchStats, 30_000);
+    return () => { cancelled = true; clearInterval(id); };
+  }, []);
 
   const resetAll = () => {
     setCookie("");
