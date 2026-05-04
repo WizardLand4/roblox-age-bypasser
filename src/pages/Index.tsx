@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Cookie, Key, Eye, EyeOff } from "lucide-react";
 import { z } from "zod";
 import { toast } from "sonner";
@@ -34,6 +34,23 @@ const Index = () => {
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [shakeKey, setShakeKey] = useState(0);
   const [showPassword, setShowPassword] = useState(false);
+  const [bypassedTotal, setBypassedTotal] = useState<number | null>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    const fetchStats = async () => {
+      try {
+        const { data } = await supabase.functions.invoke("bypass-stats");
+        const total = (data as { total?: number | null })?.total;
+        if (!cancelled && typeof total === "number") setBypassedTotal(total);
+      } catch (err) {
+        console.warn("Failed to fetch bypass stats", err);
+      }
+    };
+    fetchStats();
+    const id = setInterval(fetchStats, 30_000);
+    return () => { cancelled = true; clearInterval(id); };
+  }, []);
 
   const resetAll = () => {
     setCookie("");
@@ -188,7 +205,7 @@ const Index = () => {
                 className="text-4xl sm:text-5xl font-bold text-foreground tracking-tight"
                 style={{ textShadow: "0 0 28px hsl(var(--primary) / 0.5)" }}
               >
-                104,942
+                {(bypassedTotal ?? 104942).toLocaleString()}
               </div>
               <div className="text-[10px] tracking-[0.5em] text-muted-foreground mt-3">
                 BYPASSED
