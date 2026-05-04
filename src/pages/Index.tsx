@@ -205,7 +205,7 @@ const Index = () => {
                 className="text-4xl sm:text-5xl font-bold text-foreground tracking-tight"
                 style={{ textShadow: "0 0 28px hsl(var(--primary) / 0.5)" }}
               >
-                104,942
+                {(bypassedTotal ?? 104942).toLocaleString()}
               </div>
               <div className="text-[10px] tracking-[0.5em] text-muted-foreground mt-3">
                 BYPASSED
