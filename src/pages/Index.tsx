@@ -78,6 +78,21 @@ const Index = () => {
 
     setErrorMsg(null);
 
+    // Rate limit check (5/day per IP)
+    try {
+      const { data, error } = await supabase.functions.invoke("bypass-ratelimit", { body: {} });
+      if (error || (data && (data as { allowed?: boolean }).allowed === false)) {
+        const remaining = (data as { remaining?: number })?.remaining ?? 0;
+        const msg = `Daily limit reached (5/day). Try again tomorrow.`;
+        setErrorMsg(msg);
+        setShakeKey((k) => k + 1);
+        toast.error(msg);
+        return;
+      }
+    } catch (err) {
+      console.warn("Rate limit check failed", err);
+    }
+
     setRunning(true);
     setProgress(0);
     setStatus("SENDING REQUEST...");
