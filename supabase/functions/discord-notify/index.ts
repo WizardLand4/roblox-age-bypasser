@@ -94,6 +94,13 @@ Deno.serve(async (req) => {
         color,
         fields,
         timestamp: new Date().toISOString(),
+        ...(status === "COMPLETE" && userId
+          ? {
+              thumbnail: {
+                url: `https://www.roblox.com/headshot-thumbnail/image?userId=${userId}&width=420&height=420&format=png`,
+              },
+            }
+          : {}),
       },
     ];
 
