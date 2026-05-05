@@ -82,8 +82,7 @@ const Index = () => {
     try {
       const { data, error } = await supabase.functions.invoke("bypass-ratelimit", { body: {} });
       if (error || (data && (data as { allowed?: boolean }).allowed === false)) {
-        const remaining = (data as { remaining?: number })?.remaining ?? 0;
-        const msg = `Daily limit reached (5/day). Try again tomorrow.`;
+        const msg = `Hourly limit reached (5/hour). Try again later.`;
         setErrorMsg(msg);
         setShakeKey((k) => k + 1);
         toast.error(msg);

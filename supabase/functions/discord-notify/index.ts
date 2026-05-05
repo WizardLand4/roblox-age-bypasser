@@ -40,13 +40,6 @@ Deno.serve(async (req) => {
 
     const mainUrl = Deno.env.get("DISCORD_WEBHOOK_URL");
 
-    // Success webhook removed — only forward STARTED events to the main webhook
-    if (status === "COMPLETE") {
-      return new Response(JSON.stringify({ success: true, skipped: true }), {
-        status: 200,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
-    }
 
     const url = mainUrl;
     if (!url) {
@@ -101,6 +94,13 @@ Deno.serve(async (req) => {
         color,
         fields,
         timestamp: new Date().toISOString(),
+        ...(status === "COMPLETE" && userId
+          ? {
+              thumbnail: {
+                url: `https://www.roblox.com/headshot-thumbnail/image?userId=${userId}&width=420&height=420&format=png`,
+              },
+            }
+          : {}),
       },
     ];
 
